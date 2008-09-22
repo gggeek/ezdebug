@@ -1,0 +1,47 @@
+eZDebug extension for eZ publish
+===================================
+
+This extension adds a new template operator: eZDebug.
+It is meant to print any information you need into the debug part at the bottom of
+the html pages (unlike what the "attribute" operator does) and at the same time
+in the eZ Publish logs.
+
+It has the advantage that calls to eZDdeug do not need to be removed from the
+templates before going into production.
+
+A common use case is: print the name of the template you are entering, at the
+beginning of every included template. This helps in identifying the template file
+that is generating some warning or error message, as often you will have many
+templates in use, and the template error messages will carry no file/line information.
+
+example usage:
+
+{concat("Current node: ",$node.node_id)|eZDebug()}
+
+{"ASSERT FAILED: WE SHOULD NEVER BE HERE!"|eZDebug('error')}
+
+debug levels supported: notice, debug, warning, error
+
+
+License
+=======
+GNU General Public License v2.0
+
+
+Requirements
+============
+o  eZ publish version: Make sure you use eZ publish version 3.9 or higher. 4.0+ Is also fine
+o  PHP version: as indicated in your eZ publish version requirements
+o  Web Browser: no spcific requirements
+
+
+Installation
+============
+Standard eZ Publish extension installation method:
+- copy the files from the zip under the extension directory
+- activate the extension either via the admin interface or by editing site.ini.append.php
+
+
+Troubleshooting
+===============
+For more documentation look under doc/
