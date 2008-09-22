@@ -32,11 +32,11 @@ class eZDebugOperators
     */
     function namedParameterList()
     {
-        return array(
-                      'eZDebug' => array('debuglvl' => array( 'type' => 'string',
+        return array( 'eZDebug' => array('debuglvl' => array( 'type' => 'string',
                                                               'required' => false,
-                                                              'default' => 'debug')
-                                                             )
+                                                              'default' => 'debug'
+                                                            )
+                                        )
                     );
     }
 
@@ -71,7 +71,7 @@ class eZDebugOperators
             case 'error':
                 eZDebug::writeError( $msg );
                 break;
-			default:
+            default:
                 eZDebug::writeDebug( "[$debuglvl] " . $msg );
         }
         return "";
