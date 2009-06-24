@@ -12,7 +12,7 @@ class eZDebugOperators
     /**
      Returns the operators in this class.
     */
-    function &operatorList()
+    function operatorList()
     {
         return array( 'eZDebug' );
     }
