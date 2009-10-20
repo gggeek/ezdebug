@@ -1,22 +1,38 @@
 eZDebug extension for eZ publish
 ===================================
 
-This extension adds a new template operator: eZDebug.
-It is meant to print any information you need into the debug part at the bottom of
+This extension adds a two new template operators: eZDebug and objDebug.
+They are meant to print any information you need into the debug part at the bottom of
 the html pages (unlike what the "attribute" operator does) and at the same time
 in the eZ Publish logs.
 
-It has the advantage that calls to eZDdeug do not need to be removed from the
-templates before going into production.
+Compared to the "attribute" operator, they have the advantage that calls to
+eZDdeug do not need to be removed from the templates before going into production.
+They can also be used to dump info about scalar values, which "attribute" does not.
 
 A common use case is: print the name of the template you are entering, at the
 beginning of every included template. This helps in identifying the template file
 that is generating some warning or error message, as often you will have many
 templates in use, and the template error messages will carry no file/line information.
 
-example usage:
 
-{concat("Current node: ",$node.node_id)|eZDebug()}
+Syntax:
+
+$value | eZDebug( [debug_level='debug'] [,label=''] )
+
+eZDebug will work with scalar values, arrays and objects, but objects will be
+shown in their php form, ie. they will be different from what you can use
+directly in template code. It provides no limit on recursion depth.
+
+$value | objDebug( [show_values='not'] [,level=2] )
+
+objDebug displays exactly the same debug information that "attribute" does, but
+prints in the debug logs instead of the middle of the web page.
+
+
+Example usage:
+
+{concat("Current node: ", $node.node_id)|eZDebug()}
 
 {"ASSERT FAILED: WE SHOULD NEVER BE HERE!"|eZDebug('error')}
 

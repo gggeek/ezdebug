@@ -14,7 +14,7 @@ class eZDebugOperators
     */
     function operatorList()
     {
-        return array( 'eZDebug' );
+        return array( 'eZDebug', 'objDebug' );
     }
 
     /*
@@ -32,11 +32,24 @@ class eZDebugOperators
     */
     function namedParameterList()
     {
-        return array( 'eZDebug' => array('debuglvl' => array( 'type' => 'string',
-                                                              'required' => false,
-                                                              'default' => 'debug'
-                                                            )
-                                        )
+        return array( 'eZDebug' => array( 'debuglvl' => array( 'type' => 'string',
+                                                               'required' => false,
+                                                               'default' => 'debug'
+                                                             ),
+                                          'label'    => array( 'type' => 'string',
+                                                               'required' => false,
+                                                               'default' => ''
+                                                             ),
+                                        ),
+                      'objDebug' => array( 'show_values' => array( 'type' => 'string',
+                                                                   'required' => false,
+                                                                   'default' => ''
+                                                                 ),
+                                           'level'       => array( 'type' => 'int',
+                                                                   'required' => false,
+                                                                   'default' => 2
+                                                                 ),
+                                                )
                     );
     }
 
@@ -44,39 +57,50 @@ class eZDebugOperators
      Executes the needed operator(s).
      Checks operator names, and calls the appropriate functions.
     */
-    function modify( &$tpl, &$operatorName, &$operatorParameters, &$rootNamespace,
-                     &$currentNamespace, &$operatorValue, &$namedParameters )
+    function modify( $tpl, $operatorName, $operatorParameters, $rootNamespace,
+                     $currentNamespace, &$operatorValue, $namedParameters )
     {
         switch ( $operatorName )
         {
             case 'eZDebug':
-                $operatorValue = $this->eZdebug( $operatorValue, $namedParameters['debuglvl'] );
+                $operatorValue = $this->eZdebug( $operatorValue, $namedParameters['debuglvl'], $namedParameters['label'] );
+                break;
+            case 'objDebug':
+                $operatorValue = $this->objdebug( $operatorValue, $namedParameters['show_values'] == 'show', $namedParameters['level'] );
                 break;
         }
     }
 
-    function eZdebug( $msg, $debuglvl )
+    function eZdebug( $msg, $debuglvl, $label='' )
     {
         switch( $debuglvl )
         {
             case 'notice':
-                eZDebug::writeNotice( $msg );
+                eZDebug::writeNotice( $msg, $label );
                 break;
             case 'debug':
-                eZDebug::writeDebug( $msg );
+                eZDebug::writeDebug( $msg, $label );
                 break;
             case 'warning':
-                eZDebug::writeWarning( $msg );
+                eZDebug::writeWarning( $msg, $label );
                 break;
             case 'error':
-                eZDebug::writeError( $msg );
+                eZDebug::writeError( $msg, $label );
                 break;
             default:
-                eZDebug::writeDebug( "[$debuglvl] " . $msg );
+                eZDebug::writeDebug( "[$debuglvl] " . $msg, $label );
         }
         return "";
     }
 
+    function objdebug( $obj, $showvals=false, $maxdepth=2, $currdepth=0 )
+    {
+        $out = '';
+        $dumper = new eZTemplateAttributeOperator();
+        $dumper->displayVariable( $obj, false, $showvals, $maxdepth, $currdepth, $out );
+        eZDebug::writeDebug( $out );
+        return '';
+    }
 }
 
 ?>
