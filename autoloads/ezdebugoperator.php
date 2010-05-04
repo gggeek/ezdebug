@@ -9,12 +9,39 @@
 */
 class eZDebugOperators
 {
+    static $operators = array(
+        'eZDebug' => array(
+            'debuglvl' => array(
+                'type' => 'string',
+                'required' => false,
+                'default' => 'debug'
+            ),
+            'label' => array(
+                'type' => 'string',
+                'required' => false,
+                'default' => ''
+            ),
+        ),
+        'objDebug' => array(
+            'show_values' => array(
+                'type' => 'string',
+                'required' => false,
+                'default' => ''
+            ),
+            'level' => array(
+                'type' => 'int',
+                'required' => false,
+                'default' => 2
+            ),
+        )
+    );
+
     /**
      Returns the operators in this class.
     */
     function operatorList()
     {
-        return array( 'eZDebug', 'objDebug' );
+        return array_keys( self::$operators );
     }
 
     /*
@@ -32,25 +59,7 @@ class eZDebugOperators
     */
     function namedParameterList()
     {
-        return array( 'eZDebug' => array( 'debuglvl' => array( 'type' => 'string',
-                                                               'required' => false,
-                                                               'default' => 'debug'
-                                                             ),
-                                          'label'    => array( 'type' => 'string',
-                                                               'required' => false,
-                                                               'default' => ''
-                                                             ),
-                                        ),
-                      'objDebug' => array( 'show_values' => array( 'type' => 'string',
-                                                                   'required' => false,
-                                                                   'default' => ''
-                                                                 ),
-                                           'level'       => array( 'type' => 'int',
-                                                                   'required' => false,
-                                                                   'default' => 2
-                                                                 ),
-                                                )
-                    );
+        return self::$operators;
     }
 
     /**
