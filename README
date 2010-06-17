@@ -1,8 +1,13 @@
 eZDebug extension for eZ publish
 ===================================
 
-This extension adds a two new template operators: eZDebug and objDebug.
-They are meant to print any information you need into the debug part at the bottom of
+This extension adds a 4 new template operators:
+ eZDebug
+ objDebug
+ addTimingPoint
+ numQueries
+
+The first two are meant to add information into the debug part at the bottom of
 the html pages (unlike what the "attribute" operator does) and at the same time
 in the eZ Publish logs.
 
@@ -15,6 +20,15 @@ beginning of every included template. This helps in identifying the template fil
 that is generating some warning or error message, as often you will have many
 templates in use, and the template error messages will carry no file/line information.
 
+The third one adds a timing point, which will also be sown in the debug results
+at the bottom of the page along with the time and memory used at the time it was
+found. It is thus helpful to debug performance problems (e.g. find out in a web
+page which template blocks are taking up most time / memory to execute).
+
+The fourth one returns the number of database queries executed at the time it was
+found (either in the main database or in the cluster database).
+It is also helpful to debug performance problems.
+
 
 Syntax:
 
@@ -23,11 +37,16 @@ $value | eZDebug( [debug_level='debug'] [,label=''] )
 eZDebug will work with scalar values, arrays and objects, but objects will be
 shown in their php form, ie. they will be different from what you can use
 directly in template code. It provides no limit on recursion depth.
+Debug levels supported: notice, debug, warning, error
 
 $value | objDebug( [show_values='not'] [,level=2] )
 
 objDebug displays exactly the same debug information that "attribute" does, but
 prints in the debug logs instead of the middle of the web page.
+
+''|addTimingPoint( 'name of my timing point' )
+
+''|numQueries( [cluster_db=false] )
 
 
 Example usage:
@@ -36,7 +55,9 @@ Example usage:
 
 {"ASSERT FAILED: WE SHOULD NEVER BE HERE!"|eZDebug('error')}
 
-debug levels supported: notice, debug, warning, error
+{$unknown_object_here)|objDebug()}
+
+{concat('Queries executed so far: ',numQueries())|eZDebug()}
 
 
 License
@@ -46,7 +67,7 @@ GNU General Public License v2.0
 
 Requirements
 ============
-o  eZ publish version: Make sure you use eZ publish version 3.9 or higher. 4.0+ Is also fine
+o  eZ publish version: Make sure you use eZ publish version 4.0 or higher.
 o  PHP version: as indicated in your eZ publish version requirements
 o  Web Browser: no spcific requirements
 
@@ -55,7 +76,7 @@ Installation
 ============
 Standard eZ Publish extension installation method:
 - copy the files from the zip under the extension directory
-- activate the extension either via the admin interface or by editing site.ini.append.php
+- activate the extension either via the admin interface or by editing site.ini.append.php + regenerating autoloads
 
 
 Troubleshooting

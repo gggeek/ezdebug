@@ -1,0 +1,13 @@
+Changes from 0.2 to 0.3 - released 2010/6/17
+
+*General:
+
+- added a new template operator: numQueries(bool $cluster).
+  It returns the number of queries executed so far, either in the main db or in the cluster db
+
+- added a new template operator: addTimingPoint(string $label).
+  It is equivalent to ezDebug::addTimingPoint() in php.
+  The timing point added will be shown in the debug info.
+  It is useful e.g. to measure the memory and processing time consumed by a particular piece of template code
+
+*Bugfixes:

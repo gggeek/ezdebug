@@ -20,7 +20,7 @@ class eZDebugOperators
                 'type' => 'string',
                 'required' => false,
                 'default' => ''
-            ),
+            )
         ),
         'objDebug' => array(
             'show_values' => array(
@@ -32,8 +32,22 @@ class eZDebugOperators
                 'type' => 'int',
                 'required' => false,
                 'default' => 2
-            ),
+            )
+        ),
+        'addTimingPoint' => array(
+            'label' => array(
+                'type' => 'string',
+                'required' => true
+            )
+        ),
+        'numQueries' => array(
+            'cluster' => array(
+                'type' => 'boolean',
+                'required' => false,
+                'default' => false
+            )
         )
+
     );
 
     /**
@@ -77,6 +91,12 @@ class eZDebugOperators
             case 'objDebug':
                 $operatorValue = $this->objdebug( $operatorValue, $namedParameters['show_values'] == 'show', $namedParameters['level'] );
                 break;
+            case 'addTimingPoint':
+                eZDebug::addTimingPoint( $namedParameters['label'] );
+                $operatorValue = '';
+                break;
+            case 'numQueries':
+                $operatorValue = $this->numqueries( $namedParameters['cluster'] );
         }
     }
 
@@ -109,6 +129,39 @@ class eZDebugOperators
         $dumper->displayVariable( $obj, false, $showvals, $maxdepth, $currdepth, $out );
         eZDebug::writeDebug( $out );
         return '';
+    }
+
+    function numqueries( $cluster=false )
+    {
+        $num = -1;
+        $type = '';
+        if ( $cluster )
+        {
+            // are we in cluster mode?
+            $ini = eZINI::instance( 'file.ini' );
+            $handler = $ini->variable( 'ClusteringSettings', 'FileHandler' );
+            if ( $handler == 'eZDBFileHandler' || $handler == 'eZDFSFileHandler' )
+            {
+                $type =  preg_replace( '/^eZDBFileHandler/', '', $ini->variable( 'ClusteringSettings', 'DBBackend' ) );
+                $type =  strtolower( preg_replace( '/^Backend$/', '', $type ) );
+                $type .= '_cluster_query';
+            }
+        }
+        else
+        {
+            $ini = eZINI::instance();
+            // we cannot use $db->databasename() because we get the same for mysql and mysqli
+            $type = preg_replace( '/^ez/', '', $ini->variable( 'DatabaseSettings', 'DatabaseImplementation' ) );
+            $type .= '_query';
+        }
+
+        // read accumulator
+        $debug = eZDebug::instance();
+        if ( isset( $debug->TimeAccumulatorList[$type] ) )
+        {
+            $num = $debug->TimeAccumulatorList[$type]['count'];
+        }
+        return $num;
     }
 }
 
