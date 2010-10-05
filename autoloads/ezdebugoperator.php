@@ -34,6 +34,8 @@ class eZDebugOperators
                 'default' => 2
             )
         ),
+        'objInspect' => array(
+        ),
         'addTimingPoint' => array(
             'label' => array(
                 'type' => 'string',
@@ -91,6 +93,9 @@ class eZDebugOperators
             case 'objDebug':
                 $operatorValue = $this->objdebug( $operatorValue, $namedParameters['show_values'] == 'show', $namedParameters['level'] );
                 break;
+            case 'objInspect':
+                $operatorValue = $this->objInspect( $operatorValue );
+                break;
             case 'addTimingPoint':
                 eZDebug::addTimingPoint( $namedParameters['label'] );
                 $operatorValue = '';
@@ -119,7 +124,11 @@ class eZDebugOperators
             default:
                 eZDebug::writeDebug( "[$debuglvl] " . $msg, $label );
         }
-        return "";
+        return '';
+    }
+
+    function objInspect( $obj )
+    {
     }
 
     function objdebug( $obj, $showvals=false, $maxdepth=2, $currdepth=0 )
@@ -162,6 +171,143 @@ class eZDebugOperators
             $num = $debug->TimeAccumulatorList[$type]['count'];
         }
         return $num;
+    }
+
+    static function to_inspect( $obj, $with_typecast=true )
+    {
+
+        if ( is_object( $obj ) && method_exists( $obj, "attributes" ) && method_exists( $obj, "attribute" ) )
+        {
+            // 'template object' (should be a descendant of ezpo)
+            $out = array();
+
+            /* // load actual def from the 'definition' method
+            if ( $with_typecast )
+            {
+                $fields = array();
+                if ( method_exists( $obj, "definition" ) )
+                {
+                    $def = $obj->definition();
+                    if ( isset( $def['fields'] ) )
+                    {
+                        $fields = $def['fields'];
+                    }
+                }
+            } */
+
+            // load theorical desc parsed from online docs. A warning is logged by ezPODocScanner if class is not found
+            $class = strtolower( get_class( $obj ) );
+            $defs = ezPODocScanner::definition( $class );
+            if ( isset( $defs['attributes'] ) )
+            {
+                $defs = $def['attributes'];
+            }
+
+            foreach( $obj->attributes() as $key )
+            {
+                /// @todo log warning if type is not documented
+                $type = isset( $defs[$key]['type'] ) ? $defs[$key]['type'] : '';
+                $val = null;
+                if ( ezPODocScanner::isscalar( $type ) )
+                {
+                    // scalar attributes: serialize them straight away, even if dynamic
+                    $val = $obj->attribute( $key );
+                    if ( $with_typecast )
+                    {
+                        /// @todo the type for typecast should be gotten from $fields, as in online docs everything is a string...
+                        switch( $type )
+                        {
+                            case 'string':
+                            case 'text':
+                                /// @todo shall we cast to string anyway, since we might be getting an object / other stuff?
+                                break;
+                            case 'int':
+                            case 'integer':
+                                $val = (integer)$val;
+                                break;
+                            case 'float':
+                                $val = (float)$val;
+                                break;
+                            case 'bool':
+                            case 'boolean':
+                                $val = (boolean)$val;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    // a single object attribute: do not serialize it, only its type
+                    if ( preg_match( $fields[$key]['datatype'], '/^object \((\)+)\)$', $matches ) )
+                    {
+                        //$out = array( 'type' => $defs[$key]['type'], 'value' => null );
+                    }
+                    // an array attribute: do not serialize it, only its type
+                    /// @todo if we know the type is scalar / the attribute is static, we might want to serialize it straight away
+                    else if ( preg_match( $fields[$key]['datatype'], '/^array( \((\)+)\))?$', $matches ) )
+                    {
+                        //$out = array( 'type' => $defs[$key]['type'], 'value' => null );
+                    }
+                    else
+                    // unknown type attribute: need to retrieve it to get the type...
+                    {
+                        $val = $obj->attribute( $key );
+                        if ( is_object( $val ) )
+                        {
+                            $type = 'object (' . strtolower( get_class( $val ) . ')' );
+                            $val = null;
+                            /// @todo: for persistent objects, add the obj ID for a faster 2nd fetch
+                        }
+                        else if ( is_array( $val ) )
+                        {
+                            $type = 'array';
+                            $val = null;
+                        }
+                        else
+                        {
+                            /// a scalar! log a warning?
+                            $type = gettype( $val );
+                        }
+                    }
+                }
+                $out[$key] = array( 'type' => $type, 'value' => $val );
+            }
+            $out = array( 'type' => $class, 'value' => $out );
+
+        }
+        else if ( is_array( $obj ) || is_object( $obj ) )
+        {
+            // not a template object: do a "simple" dump
+            // nb: we do not recurse here, we just want type of obj attributes / array elements
+            /// @bug this means we will not be able later to get at subitems anymore... maybe we should recurse after all?
+            $out = array();
+            foreach( $obj as $key => $val )
+            {
+                if ( is_object( $val ) )
+                {
+                    $type = 'object (' . strtolower( get_class( $val ) . ')' );
+                    $val = null;
+                    /// @todo: for persistent objects, add the obj ID to allow a 2nd fetch
+                }
+                else if ( is_array( $val ) )
+                {
+                    $type = 'array';
+                    $val = null;
+                }
+                else
+                {
+                    $type = gettype( $val );
+                }
+                $out[$key] = array( 'type' => $type, 'value' => $val );
+            }
+            $out = array( 'type' => ( is_array( $obj ) ? 'array' : get_class( $obj ) ), 'value' => $out );
+        }
+        else
+        {
+            // not an object: do a simple dump
+            $out = array( 'type' => gettype( $obj ), 'value' => $obj );
+        }
+        return $out;
     }
 }
 
