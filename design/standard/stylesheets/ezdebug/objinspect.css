@@ -11,10 +11,10 @@
 */
 
 
-/* nodes for buliding a tree of xmlrpc values */
+/* nodes for buliding a tree of template values */
 
 .ygtvlabel, .ygtvlabelu, .ygtvlabeln, .ygtvlabelt, .ygtvlabeltu, .ygtvlabel:hover {
-  font: normal 12px verdana, sans-serif;
+  font: normal 10px verdana, sans-serif;
   vertical-align: top;
   margin-left:4px;
 }
@@ -122,27 +122,4 @@
 
 .tt {
 	font: 75% sans-serif;
-}
-
-.bd label {
-
-}
-
-/* panel for editing xmlrpc values */
-.bd input {
-	width: 200px;
-}
-
-.bd select {
-	width: 204px; /* pixel perfect with ff2 on win xp... */
-}
-
-.bd label {
-	display: block;
-	float: left;
-	width: 75px;
-}
-
-.bd .clear {
-	height: 5px;
 }
