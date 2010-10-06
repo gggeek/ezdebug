@@ -52,6 +52,8 @@ class eZDebugOperators
 
     );
 
+    static $inspectcounter = 1;
+
     /**
      Returns the operators in this class.
     */
@@ -94,10 +96,12 @@ class eZDebugOperators
                 $operatorValue = $this->objdebug( $operatorValue, $namedParameters['show_values'] == 'show', $namedParameters['level'] );
                 break;
             case 'objInspect':
-                require_once( "kernel/common/template.php" );
+                require_once( 'kernel/common/template.php' );
                 $tpl = templateInit();
-                $tpl->setVariable( "object", json_encode( $this->objInspect( $operatorValue ) ) );
-                $operatorValue = $tpl->fetch( "design:ezdebug/objinspect.tpl" );
+                $tpl->setVariable( 'value', json_encode( $this->objInspect( $operatorValue ) ) );
+                $tpl->setVariable( 'counter', self::$inspectcounter );
+                $operatorValue = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
+                self::$inspectcounter++;
                 break;
             case 'addTimingPoint':
                 eZDebug::addTimingPoint( $namedParameters['label'] );
@@ -280,12 +284,14 @@ class eZDebugOperators
         else if ( is_array( $obj ) || is_object( $obj ) )
         {
             // not a template object: do a "simple" dump
-            // nb: we do not recurse here, we just want type of obj attributes / array elements
-            /// @bug this means we will not be able later to get at subitems anymore... maybe we should recurse after all?
+            // nb: we do recurse here,
+            // since only for persistent objects we can do on-demand loading later
             $out = array();
+            $i = 0;
+            $isarray = true;
             foreach( $obj as $key => $val )
             {
-                if ( is_object( $val ) )
+                /*if ( is_object( $val ) )
                 {
                     $type = 'object (' . strtolower( get_class( $val ) . ')' );
                     $val = null;
@@ -300,9 +306,22 @@ class eZDebugOperators
                 {
                     $type = gettype( $val );
                 }
-                $out[$key] = array( 'type' => $type, 'value' => $val );
+                $out[$key] = array( 'type' => $type, 'value' => $val );*/
+                if ( $isarray && $key !== $i++ )
+                {
+                    $isarray = false;
+                }
+                $out[$key] = self::objInspect( $val, $with_typecast );
             }
-            $out = array( 'type' => ( is_array( $obj ) ? 'array' : get_class( $obj ) ), 'value' => $out );
+            if ( is_array( $obj ) )
+            {
+                $type = $isarray ? 'array' : 'hash';
+            }
+            else
+            {
+                $type = 'object (' .get_class( $obj ) . ')';
+            }
+            $out = array( 'type' => $type, 'value' => $out );
         }
         else
         {

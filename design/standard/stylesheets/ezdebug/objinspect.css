@@ -10,6 +10,13 @@
 * @todo fix word-wrapping of node contents for not-quite-wide-enough windows
 */
 
+/* container div */
+
+.ezdebugparamparamdiv {
+  background-color: white;
+  border: 1px gray dotted;
+  margin: 1px;
+}
 
 /* nodes for buliding a tree of template values */
 
