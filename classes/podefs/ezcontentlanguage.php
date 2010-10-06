@@ -46,6 +46,16 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'The number of objects translated to this language.',
     ),
+    'class_count' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
   ),
 );
 ?>

@@ -29,5 +29,9 @@ $ezpodesc = array (
       'desc' => 'Returns TRUE if the VAT type is dynamic, FALSE otherwise.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

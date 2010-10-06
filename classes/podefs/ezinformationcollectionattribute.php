@@ -101,5 +101,9 @@ $ezpodesc = array (
       'desc' => 'The content of the class attribute which the collection attribute is made from.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

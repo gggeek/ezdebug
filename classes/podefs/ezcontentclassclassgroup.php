@@ -29,5 +29,11 @@ $ezpodesc = array (
       'desc' => 'The name of the class group (for example &quot;Media&quot;).',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'contentclass_id',
+    1 => 'contentclass_version',
+    2 => 'group_id',
+  ),
 );
 ?>

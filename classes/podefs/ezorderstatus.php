@@ -35,5 +35,9 @@ $ezpodesc = array (
       'desc' => 'TRUE if the status is one of the built-in/internal statuses, FALSE if it is a custom status.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

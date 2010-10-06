@@ -71,5 +71,9 @@ $ezpodesc = array (
       'desc' => 'An array representing the selected product options.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

@@ -59,5 +59,9 @@ $ezpodesc = array (
       'desc' => 'The price of the order item excluding the VAT.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

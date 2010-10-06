@@ -58,6 +58,16 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'The product collection that belongs to the basket.',
     ),
+    'items_info' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
   ),
 );
 ?>

@@ -107,5 +107,10 @@ $ezpodesc = array (
       'desc' => 'The MIME type part (for example &quot;x-msvideo&quot;).',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'contentobject_attribute_id',
+    1 => 'version',
+  ),
 );
 ?>

@@ -142,6 +142,113 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'Not documented yet.',
     ),
+    'serialized_name_list' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'serialized_description_list' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'url_alias_name' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'language_mask' => 
+    array (
+      'type' => 'integer',
+      'static' => true,
+      'desc' => '',
+    ),
+    'initial_language_id' => 
+    array (
+      'type' => 'integer',
+      'static' => true,
+      'desc' => '',
+    ),
+    'sort_field' => 
+    array (
+      'type' => 'integer',
+      'static' => true,
+      'desc' => '',
+    ),
+    'sort_order' => 
+    array (
+      'type' => 'integer',
+      'static' => true,
+      'desc' => '',
+    ),
+    'object_list' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'nameList' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'description' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'descriptionList' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'languages' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'prioritized_languages' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'prioritized_languages_js_array' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'can_create_languages' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'top_priority_language_locale' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'always_available_language' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
+    1 => 'version',
   ),
 );
 ?>

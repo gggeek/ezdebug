@@ -47,5 +47,9 @@ $ezpodesc = array (
       'desc' => 'A UNIX timestamp pinpointing the exact date/time when the URL last modified.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

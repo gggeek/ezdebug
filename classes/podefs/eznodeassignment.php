@@ -125,5 +125,9 @@ $ezpodesc = array (
       'desc' => 'A temporary node (as ezcontentobjecttreenode object) for the object that the version belongs to. The temporary node does not exist in the database.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

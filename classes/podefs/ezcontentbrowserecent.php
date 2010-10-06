@@ -47,5 +47,9 @@ $ezpodesc = array (
       'desc' => 'The ID of the object which is encapsulated by the node under which something was recently published.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

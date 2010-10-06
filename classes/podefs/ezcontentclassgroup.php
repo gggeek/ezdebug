@@ -53,5 +53,9 @@ $ezpodesc = array (
       'desc' => 'The user who last modified the class group (as ezuser object).',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

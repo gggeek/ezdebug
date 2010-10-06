@@ -394,6 +394,52 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'Returns TRUE if the object is marked as &quot;always available&quot; (i.e. the object will be fetched even if it does not exist in any of the site languages), FALSE otherwise.',
     ),
+    'grouped_data_map' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'all_languages' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'allowed_assign_section_list' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'allowed_assign_state_id_list' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'allowed_assign_state_list' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'state_id_array' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'state_identifier_array' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
   ),
 );
 ?>

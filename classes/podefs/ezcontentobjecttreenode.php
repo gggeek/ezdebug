@@ -286,6 +286,28 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'The visibility status of the node: &quot;Visible&quot;, &quot;Hidden&quot; or &quot;Hidden by superior&quot;.',
     ),
+    'path_with_names' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'classes_js_array' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'is_container' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'node_id',
   ),
 );
 ?>

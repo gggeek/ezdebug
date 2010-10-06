@@ -53,5 +53,9 @@ $ezpodesc = array (
       'desc' => 'Not documented yet.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

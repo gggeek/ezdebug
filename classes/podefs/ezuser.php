@@ -106,6 +106,22 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'Not documented yet.',
     ),
+    'is_locked' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'login_count' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'contentobject_id',
   ),
 );
 ?>

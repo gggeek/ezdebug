@@ -17,5 +17,9 @@ $ezpodesc = array (
       'desc' => 'The name of the product category.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

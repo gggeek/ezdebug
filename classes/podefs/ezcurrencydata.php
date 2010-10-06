@@ -59,5 +59,9 @@ $ezpodesc = array (
       'desc' => 'The actual rate value that will be used in calculations. The rate value will be the same as the custom rate if it is not zero. If the custom rate is 0.00000 or not specified then the auto rate will be multiplied by the rate factor.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

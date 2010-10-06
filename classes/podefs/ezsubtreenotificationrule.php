@@ -35,5 +35,9 @@ $ezpodesc = array (
       'desc' => 'The actual node (as an ezcontentobjecttreenode object).',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

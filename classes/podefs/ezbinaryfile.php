@@ -65,5 +65,10 @@ $ezpodesc = array (
       'desc' => 'The MIME type part (for example &quot;wav&quot;).',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'contentobject_attribute_id',
+    1 => 'version',
+  ),
 );
 ?>

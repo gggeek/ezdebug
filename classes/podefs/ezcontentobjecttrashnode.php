@@ -191,5 +191,9 @@ $ezpodesc = array (
       'desc' => 'Returns the path identification string of the parent node (for example &quot;company/about_us&quot;) regardless whether the parent node has been removed, moved to another place in the content tree or not.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'node_id',
+  ),
 );
 ?>

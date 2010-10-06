@@ -29,5 +29,9 @@ $ezpodesc = array (
       'desc' => 'Not in use.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

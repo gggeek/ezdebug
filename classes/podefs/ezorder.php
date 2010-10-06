@@ -184,6 +184,16 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'Not documented yet.',
     ),
+    'order_info' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
   ),
 );
 ?>

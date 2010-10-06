@@ -65,5 +65,9 @@ $ezpodesc = array (
       'desc' => 'The user who submitted the information (as ezuser object).',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

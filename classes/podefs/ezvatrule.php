@@ -58,6 +58,16 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'The name of the VAT type.',
     ),
+    'country_code' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
   ),
 );
 ?>

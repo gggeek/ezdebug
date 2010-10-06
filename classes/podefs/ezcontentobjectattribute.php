@@ -221,5 +221,12 @@ $ezpodesc = array (
       'desc' => 'An array containing information about how the attribute should be displayed on the class level.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+    1 => 'contentobject_id',
+    2 => 'version',
+    3 => 'language_code',
+  ),
 );
 ?>

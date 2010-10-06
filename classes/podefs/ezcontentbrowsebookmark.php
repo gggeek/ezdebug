@@ -41,5 +41,9 @@ $ezpodesc = array (
       'desc' => 'The ID number of the object that is referenced by the bookmarked node.',
     ),
   ),
+  'keys' => 
+  array (
+    0 => 'id',
+  ),
 );
 ?>

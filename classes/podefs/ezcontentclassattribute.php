@@ -166,6 +166,71 @@ $ezpodesc = array (
       'static' => false,
       'desc' => 'Array of miscellaneous display parameters used by the system (for example whether the components of the edit interface should be grouped or not).',
     ),
+    'serialized_name_list' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'serialized_description_list' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'data_text5' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'serialized_data_text' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'category' => 
+    array (
+      'type' => 'string',
+      'static' => true,
+      'desc' => '',
+    ),
+    'nameList' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'description' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'descriptionList' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'data_text_i18n' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+    'data_text_i18n_list' => 
+    array (
+      'type' => 'unknown',
+      'static' => false,
+      'desc' => '',
+    ),
+  ),
+  'keys' => 
+  array (
+    0 => 'id',
+    1 => 'version',
   ),
 );
 ?>
