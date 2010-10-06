@@ -94,7 +94,10 @@ class eZDebugOperators
                 $operatorValue = $this->objdebug( $operatorValue, $namedParameters['show_values'] == 'show', $namedParameters['level'] );
                 break;
             case 'objInspect':
-                $operatorValue = $this->objInspect( $operatorValue );
+                require_once( "kernel/common/template.php" );
+                $tpl = templateInit();
+                $tpl->setVariable( "object", json_encode( $this->objInspect( $operatorValue ) ) );
+                $operatorValue = $tpl->fetch( "design:ezdebug/objinspect.tpl" );
                 break;
             case 'addTimingPoint':
                 eZDebug::addTimingPoint( $namedParameters['label'] );
@@ -125,10 +128,6 @@ class eZDebugOperators
                 eZDebug::writeDebug( "[$debuglvl] " . $msg, $label );
         }
         return '';
-    }
-
-    function objInspect( $obj )
-    {
     }
 
     function objdebug( $obj, $showvals=false, $maxdepth=2, $currdepth=0 )
@@ -173,7 +172,10 @@ class eZDebugOperators
         return $num;
     }
 
-    static function to_inspect( $obj, $with_typecast=true )
+    /**
+    * Creates the serialized version of a value that can be used for step-by-step drilldown/inspection
+    */
+    static function objInspect( $obj, $with_typecast=true )
     {
 
         if ( is_object( $obj ) && method_exists( $obj, "attributes" ) && method_exists( $obj, "attribute" ) )
@@ -200,7 +202,7 @@ class eZDebugOperators
             $defs = ezPODocScanner::definition( $class );
             if ( isset( $defs['attributes'] ) )
             {
-                $defs = $def['attributes'];
+                $defs = $defs['attributes'];
             }
 
             foreach( $obj->attributes() as $key )
@@ -238,13 +240,13 @@ class eZDebugOperators
                 else
                 {
                     // a single object attribute: do not serialize it, only its type
-                    if ( preg_match( $fields[$key]['datatype'], '/^object \((\)+)\)$', $matches ) )
+                    if ( preg_match( '/^object \((\)+)\)$/', $type, $matches ) )
                     {
                         //$out = array( 'type' => $defs[$key]['type'], 'value' => null );
                     }
                     // an array attribute: do not serialize it, only its type
                     /// @todo if we know the type is scalar / the attribute is static, we might want to serialize it straight away
-                    else if ( preg_match( $fields[$key]['datatype'], '/^array( \((\)+)\))?$', $matches ) )
+                    else if ( preg_match( '/^array( \((\)+)\))?$/', $type, $matches ) )
                     {
                         //$out = array( 'type' => $defs[$key]['type'], 'value' => null );
                     }
@@ -272,7 +274,7 @@ class eZDebugOperators
                 }
                 $out[$key] = array( 'type' => $type, 'value' => $val );
             }
-            $out = array( 'type' => $class, 'value' => $out );
+            $out = array( 'type' => 'object (' . $class . ')', 'value' => $out );
 
         }
         else if ( is_array( $obj ) || is_object( $obj ) )
