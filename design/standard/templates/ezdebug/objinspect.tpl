@@ -5,8 +5,12 @@
  @param $counter a counter that should be incremented for every time this tpl is used
  @param $value the variable to be debugged
 
- @todo switch to yui 3? nb: treeview widget is not officially in yet...
- @todo use smarter loading (ezjscore_based)
+ @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yiu 2.8.1 (version in use in eZP 4.4)
+ @todo use smarter loading (ezjscore_based) for js & css files
+
+ @version $Id$
+ @copyright (C) Gaetano Giunta 2010
+ @license code licensed under the GPL License: see README
 *}
 
 {run-once}

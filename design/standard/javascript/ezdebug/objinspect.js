@@ -3,10 +3,10 @@
  * nested structures of eZP template values
  *
  * @author G. Giunta
- * @version $Id: xmlrpc_display.js,v 1.3 2007/01/10 22:31:37 ggiunta Exp $
- * @copyright
+ * @version $Id$
+ * @copyright (C) Gaetano Giunta 2010
+ * @license code licensed under the GPL License: see README
  *
- * @todo use this.labelStyle instead of hardcoded 'ygtvmv' for styles???
  * @todo smarter tree redawing: rebuild only the subtree needed
  * @todo find a smarter way to keep tooltips appearing after node buttons have been hidden + shown again...
  * @todo rewrite manipulation of values functions using indexOf(). In case of IE, Array has been extended...
