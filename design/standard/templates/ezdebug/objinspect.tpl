@@ -12,11 +12,6 @@
 <!-- YUI Treeview component: treeview -->
 <script type="text/javascript" src={'javascript/yui/treeview.js'|ezdesign()} ></script>
 <link rel="stylesheet" type="text/css" href={'stylesheets/yui/tree.css'|ezdesign()} />
-{*<!-- YUI Dialog component -->
-<script type="text/javascript" src={'javascript/yui/dom.js'|ezdesign()} ></script>
-<script type="text/javascript" src={'javascript/yui/dragdrop.js'|ezdesign()} ></script>
-<script type="text/javascript" src={'javascript/yui/container.js'|ezdesign()} ></script>
-<link rel="stylesheet" type="text/css" href={'stylesheets/yui/container.css'|ezdesign()} />*}
 <!-- display components -->
 <script type="text/javascript" src={'javascript/ezdebug/objinspect.js'|ezdesign()} ></script>
 <link rel="stylesheet" type="text/css" href={'stylesheets/ezdebug/objinspect.css'|ezdesign()} />
@@ -24,13 +19,10 @@
 {** @todo better naming for li elements, when this tpl is used more than once in a page *}
 {def $i = 1}
 
-<div class="">
+<div id="param{$i}" class="paramdiv">
     <noscript>
     WARNING: this box is completely useless without javascript support.<br />Please use a javascript-enabled browser
     </noscript>
-    <ol id="valuepanel">
-        <li id="param{$i}" class="paramdiv"></li>
-    </ol>
 </div>
 
 <script type="text/javascript">
@@ -41,8 +33,3 @@
     nodes[{$i}] = new YAHOO.widget.eZDebugNode({$object}, trees[{$i}].getRoot(), true, null, false);
     trees[{$i}].draw();
 </script>
-
-{* debugging aid... *}
-{*<pre>
-    {$object|wash()}
-</pre>*}
