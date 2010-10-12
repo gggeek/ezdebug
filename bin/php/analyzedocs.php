@@ -24,7 +24,7 @@ foreach( ezPODocScanner::scanIndexPageForClasses() as $obj => $desc )
 foreach( $descriptions as $obj => $description )
 {
     // load actual class and use its definition() method
-    $classname = findClassNameGivenLowerCaseName( $obj );
+    $classname = ezPODocScanner::findClassNameGivenLowerCaseName( $obj );
     if ( !$classname )
     {
         $cli->output( "Actual class could not be loaded for $obj" );
@@ -126,23 +126,5 @@ if ( !$isQuiet )
 }
 
 $script->shutdown();
-
-
-function findClassNameGivenLowerCaseName( $classname )
-{
-    $classes = include( 'autoload/ezp_kernel.php' );
-    foreach ( $classes as $name => $file )
-    {
-        if ( strtolower( $name ) == $classname )
-            return $name;
-    }
-    $classes = include( 'var/autoload/ezp_extension.php' );
-    foreach ( $classes as $name => $file )
-    {
-        if ( strtolower( $name ) == $classname )
-            return $name;
-    }
-    return false;
-}
 
 ?>

@@ -3,7 +3,7 @@
 *
 * @author Gaetano Giunta
 * @version $Id$
-* @copytight (C) Gaetano Giunta 2008
+* @copyright (C) Gaetano Giunta 2008-2010
 * @license code licensed under the GPL License: see README
 * @access public
 */
@@ -204,6 +204,8 @@ class eZDebugOperators
             // load theorical desc parsed from online docs. A warning is logged by ezPODocScanner if class is not found
             $class = strtolower( get_class( $obj ) );
             $defs = ezPODocScanner::definition( $class );
+            $persistent = @$defs['persistent'];
+            $keys = @$defs['keys'];
             if ( isset( $defs['attributes'] ) )
             {
                 $defs = $defs['attributes'];
@@ -238,47 +240,59 @@ class eZDebugOperators
                             case 'boolean':
                                 $val = (boolean)$val;
                                 break;
+                            /// @todo log warning: unknown type
                         }
                     }
                 }
                 else
                 {
-                    // a single object attribute: do not serialize it, only its type
-                    if ( preg_match( '/^object \((\)+)\)$/', $type, $matches ) )
+                    /// if we know the current obj is persistent, we do not recurse,
+                    /// allowing complex attributes to be fetched later via ajax calls
+
+                    if ( !$persistent )
                     {
-                        //$out = array( 'type' => $defs[$key]['type'], 'value' => null );
-                    }
-                    // an array attribute: do not serialize it, only its type
-                    /// @todo if we know the type is scalar / the attribute is static, we might want to serialize it straight away
-                    else if ( preg_match( '/^array( \((\)+)\))?$/', $type, $matches ) )
-                    {
-                        //$out = array( 'type' => $defs[$key]['type'], 'value' => null );
-                    }
-                    else
-                    // unknown type attribute: need to retrieve it to get the type...
-                    {
+                        /// if we know the current obj is not persistent, we have to serialize
+                        /// chidren straight away, or we will not be able to get them later
+                        /// using further ajax calls anyway
+
                         $val = $obj->attribute( $key );
+                        $deftype = $type;
                         if ( is_object( $val ) )
                         {
                             $type = 'object (' . strtolower( get_class( $val ) . ')' );
-                            $val = null;
-                            /// @todo: for persistent objects, add the obj ID for a faster 2nd fetch
                         }
                         else if ( is_array( $val ) )
                         {
                             $type = 'array';
-                            $val = null;
+                            if ( array_keys( $val ) !== range( 0, count( $val )-1 ) )
+                            {
+                                $type = 'hash';
+                            }
                         }
                         else
                         {
                             /// a scalar! log a warning?
                             $type = gettype( $val );
                         }
+
+                        /// @todo check if type here is consistent with type from def
+
+                        $val = self::objInspect( $val );
                     }
                 }
                 $out[$key] = array( 'type' => $type, 'value' => $val );
             }
             $out = array( 'type' => 'object (' . $class . ')', 'value' => $out );
+            // for persistent objects, send keys back to allow later retrieval
+            if ( $persistent )
+            {
+                $keyvals = array();
+                foreach( $keys as $key )
+                {
+                    $keyvals[] = $obj->attribute( $key );
+                }
+                $out['keys'] = implode( $keyvals, ',' );
+            }
 
         }
         else if ( is_array( $obj ) || is_object( $obj ) )
@@ -291,22 +305,6 @@ class eZDebugOperators
             $isarray = true;
             foreach( $obj as $key => $val )
             {
-                /*if ( is_object( $val ) )
-                {
-                    $type = 'object (' . strtolower( get_class( $val ) . ')' );
-                    $val = null;
-                    /// @todo: for persistent objects, add the obj ID to allow a 2nd fetch
-                }
-                else if ( is_array( $val ) )
-                {
-                    $type = 'array';
-                    $val = null;
-                }
-                else
-                {
-                    $type = gettype( $val );
-                }
-                $out[$key] = array( 'type' => $type, 'value' => $val );*/
                 if ( $isarray && $key !== $i++ )
                 {
                     $isarray = false;

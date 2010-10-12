@@ -180,5 +180,22 @@ class ezPODocScanner
         }
     }
 
+    function findClassNameGivenLowerCaseName( $classname )
+    {
+        $classes = include( 'autoload/ezp_kernel.php' );
+        foreach ( $classes as $name => $file )
+        {
+            if ( strtolower( $name ) == $classname )
+                return $name;
+        }
+        $classes = include( 'var/autoload/ezp_extension.php' );
+        foreach ( $classes as $name => $file )
+        {
+            if ( strtolower( $name ) == $classname )
+                return $name;
+        }
+        return false;
+    }
+
 }
 ?>
