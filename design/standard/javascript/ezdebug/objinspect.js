@@ -243,7 +243,15 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 
 		sb[sb.length] = ' class="' + this.labelStyle + 't"';
 
-		sb[sb.length] = ' >['+this.data.type+']</span>';
+		matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
+		if (matches != null)
+		{
+		    sb[sb.length] = ' >['+matches[1]+'(<a href="'+ezdebug_objdocroot+matches[2]+'" target="_blank">'+matches[2]+'</a>)]</span>';
+		}
+		else
+		{
+		    sb[sb.length] = ' >['+this.data.type+']</span>';
+		}
 		sb[sb.length] = '</td>';
 		sb[sb.length] = '</tr>';
 		sb[sb.length] = '</table>';

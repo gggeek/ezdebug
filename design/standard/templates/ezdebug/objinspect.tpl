@@ -27,6 +27,8 @@
 <script type="text/javascript">
     var ezdebug_trees = [];
     var ezdebug_nodes = [];
+    {*var ezdebug_sdkversion = '{$sdkversion}';*}
+    var ezdebug_objdocroot = 'http://doc.ez.no/eZ-Publish/Technical-manual/4.x/Reference/Objects/'
 </script>
 {/run-once}
 

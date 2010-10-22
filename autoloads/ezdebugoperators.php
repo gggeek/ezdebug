@@ -100,6 +100,7 @@ class eZDebugOperators
                 $tpl = templateInit();
                 $tpl->setVariable( 'value', json_encode( $this->objInspect( $operatorValue ) ) );
                 $tpl->setVariable( 'counter', self::$inspectcounter );
+                //$tpl->setVariable( 'sdkversion', eZPublishSDK::version() );
                 $operatorValue = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
                 self::$inspectcounter++;
                 break;
