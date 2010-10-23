@@ -1,11 +1,12 @@
 eZDebug extension for eZ publish
 ===================================
 
-This extension adds a 4 new template operators:
+This extension adds 5 new template operators:
  eZDebug
  objDebug
  addTimingPoint
  numQueries
+ objInspect
 
 The first two are meant to add information into the debug part at the bottom of
 the html pages (unlike what the "attribute" operator does) and at the same time
@@ -29,24 +30,31 @@ The fourth one returns the number of database queries executed at the time it wa
 found (either in the main database or in the cluster database).
 It is also helpful to debug performance problems.
 
+The fifth one is meant to enable user-friendly, graphically-pleasing way to dump
+variables in the middle of a template: objects can be inspected via drill-down
+of their properties, links are available to the ez.no online docs, and much more.
+You really have to see it to believe it!
+
 
 Syntax:
 
-$value | eZDebug( [debug_level='debug'] [,label=''] )
+1) $value|eZDebug( [debug_level='debug'] [,label=''] )
 
 eZDebug will work with scalar values, arrays and objects, but objects will be
 shown in their php form, ie. they will be different from what you can use
 directly in template code. It provides no limit on recursion depth.
 Debug levels supported: notice, debug, warning, error
 
-$value | objDebug( [show_values='not'] [,level=2] )
+2) $value|objDebug( [show_values='not'] [,level=2] )
 
 objDebug displays exactly the same debug information that "attribute" does, but
 prints in the debug logs instead of the middle of the web page.
 
-''|addTimingPoint( 'name of my timing point' )
+3) ''|addTimingPoint( 'name of my timing point' )
 
-''|numQueries( [cluster_db=false] )
+4) ''|numQueries( [cluster_db=false] )
+
+5) $value|objInspect()
 
 
 Example usage:
@@ -70,6 +78,10 @@ Requirements
 o  eZ publish version: Make sure you use eZ publish version 4.0 or higher.
 o  PHP version: as indicated in your eZ publish version requirements
 o  Web Browser: no spcific requirements
+o  For the objInspect operator to work, other extensions are necessary:
+   . ezpersistentobject_inspector
+   . ezwebservicesapi, which in turns needs either one of
+   . ezjscore or ggwebservices
 
 
 Installation

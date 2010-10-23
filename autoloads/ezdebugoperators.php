@@ -98,8 +98,17 @@ class eZDebugOperators
             case 'objInspect':
                 require_once( 'kernel/common/template.php' );
                 $tpl = templateInit();
-                $tpl->setVariable( 'value', json_encode( $this->objInspect( $operatorValue ) ) );
                 $tpl->setVariable( 'counter', self::$inspectcounter );
+                if ( class_exists( 'ezPOInspector' ) )
+                {
+                    $tpl->setVariable( 'value', json_encode( ezPOInspector::objInspect( $operatorValue ) ) );
+                    $tpl->setVariable( 'error', false );
+                }
+                else
+                {
+                    $tpl->setVariable( 'value', null );
+                    $tpl->setVariable( 'error', "Cannot insepct value: extension ezpersistentobject_inspector most likely missing" );
+                }
                 //$tpl->setVariable( 'sdkversion', eZPublishSDK::version() );
                 $operatorValue = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
                 self::$inspectcounter++;
@@ -177,158 +186,6 @@ class eZDebugOperators
         return $num;
     }
 
-    /**
-    * Creates the serialized version of a value that can be used for step-by-step drilldown/inspection
-    */
-    static function objInspect( $obj, $with_typecast=true )
-    {
-
-        if ( is_object( $obj ) && method_exists( $obj, "attributes" ) && method_exists( $obj, "attribute" ) )
-        {
-            // 'template object' (should be a descendant of ezpo)
-            $out = array();
-
-            /* // load actual def from the 'definition' method
-            if ( $with_typecast )
-            {
-                $fields = array();
-                if ( method_exists( $obj, "definition" ) )
-                {
-                    $def = $obj->definition();
-                    if ( isset( $def['fields'] ) )
-                    {
-                        $fields = $def['fields'];
-                    }
-                }
-            } */
-
-            // load theorical desc parsed from online docs. A warning is logged by ezPODocScanner if class is not found
-            $class = strtolower( get_class( $obj ) );
-            $defs = ezPODocScanner::definition( $class );
-            $persistent = @$defs['persistent'];
-            $keys = @$defs['keys'];
-            if ( isset( $defs['attributes'] ) )
-            {
-                $defs = $defs['attributes'];
-            }
-
-            foreach( $obj->attributes() as $key )
-            {
-                /// @todo log warning if type is not documented
-                $type = isset( $defs[$key]['type'] ) ? $defs[$key]['type'] : '';
-                $val = null;
-                if ( ezPODocScanner::isscalar( $type ) )
-                {
-                    // scalar attributes: serialize them straight away, even if dynamic
-                    $val = $obj->attribute( $key );
-                    if ( $with_typecast )
-                    {
-                        /// @todo the type for typecast should be gotten from $fields, as in online docs everything is a string...
-                        switch( $type )
-                        {
-                            case 'string':
-                            case 'text':
-                                /// @todo shall we cast to string anyway, since we might be getting an object / other stuff?
-                                break;
-                            case 'int':
-                            case 'integer':
-                                $val = (integer)$val;
-                                break;
-                            case 'float':
-                                $val = (float)$val;
-                                break;
-                            case 'bool':
-                            case 'boolean':
-                                $val = (boolean)$val;
-                                break;
-                            /// @todo log warning: unknown type
-                        }
-                    }
-                }
-                else
-                {
-                    /// if we know the current obj is persistent, we do not recurse,
-                    /// allowing complex attributes to be fetched later via ajax calls
-
-                    if ( !$persistent )
-                    {
-                        /// if we know the current obj is not persistent, we have to serialize
-                        /// chidren straight away, or we will not be able to get them later
-                        /// using further ajax calls anyway
-
-                        $val = $obj->attribute( $key );
-                        $deftype = $type;
-                        if ( is_object( $val ) )
-                        {
-                            $type = 'object (' . strtolower( get_class( $val ) . ')' );
-                        }
-                        else if ( is_array( $val ) )
-                        {
-                            $type = 'array';
-                            if ( array_keys( $val ) !== range( 0, count( $val )-1 ) )
-                            {
-                                $type = 'hash';
-                            }
-                        }
-                        else
-                        {
-                            /// a scalar! log a warning?
-                            $type = gettype( $val );
-                        }
-
-                        /// @todo check if type here is consistent with type from def
-
-                        $val = self::objInspect( $val );
-                    }
-                }
-                $out[$key] = array( 'type' => $type, 'value' => $val );
-            }
-            $out = array( 'type' => 'object (' . $class . ')', 'value' => $out );
-            // for persistent objects, send keys back to allow later retrieval
-            if ( $persistent )
-            {
-                $keyvals = array();
-                foreach( $keys as $key )
-                {
-                    $keyvals[] = $obj->attribute( $key );
-                }
-                $out['keys'] = implode( $keyvals, ',' );
-            }
-
-        }
-        else if ( is_array( $obj ) || is_object( $obj ) )
-        {
-            // not a template object: do a "simple" dump
-            // nb: we do recurse here,
-            // since only for persistent objects we can do on-demand loading later
-            $out = array();
-            $i = 0;
-            $isarray = true;
-            foreach( $obj as $key => $val )
-            {
-                if ( $isarray && $key !== $i++ )
-                {
-                    $isarray = false;
-                }
-                $out[$key] = self::objInspect( $val, $with_typecast );
-            }
-            if ( is_array( $obj ) )
-            {
-                $type = $isarray ? 'array' : 'hash';
-            }
-            else
-            {
-                $type = 'object (' .get_class( $obj ) . ')';
-            }
-            $out = array( 'type' => $type, 'value' => $out );
-        }
-        else
-        {
-            // not an object: do a simple dump
-            $out = array( 'type' => gettype( $obj ), 'value' => $obj );
-        }
-        return $out;
-    }
 }
 
 ?>
