@@ -5,7 +5,7 @@
  @param $counter a counter that should be incremented for every time this tpl is used
  @param $value the variable to be debugged
 
- @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yiu 2.8.1 (version in use in eZP 4.4)
+ @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yui 2.8.1 (version in use in eZP 4.4)?
  @todo use smarter loading (ezjscore_based) for js & css files
 
  @version $Id$
@@ -15,11 +15,11 @@
 
 {run-once}
 <!-- YUI Treeview component: base libs -->
-<script type="text/javascript" src={'javascript/yui/yahoo.js'|ezdesign()} ></script>
-<script type="text/javascript" src={'javascript/yui/event.js'|ezdesign()} ></script>
+<script type="text/javascript" src={'lib/yui/2.5.0/build/yahoo/yahoo.js'|ezdesign()} ></script>
+<script type="text/javascript" src={'lib/yui/2.5.0/build/event/event.js'|ezdesign()} ></script>
 <!-- YUI Treeview component: treeview -->
-<script type="text/javascript" src={'javascript/yui/treeview.js'|ezdesign()} ></script>
-<link rel="stylesheet" type="text/css" href={'stylesheets/yui/tree.css'|ezdesign()} />
+<script type="text/javascript" src={'lib/yui/2.5.0/build/treeview/treeview.js'|ezdesign()} ></script>
+<link rel="stylesheet" type="text/css" href={'stylesheets/ezdebug/tree.css'|ezdesign()} />
 <!-- display components -->
 <script type="text/javascript" src={'javascript/ezdebug/objinspect.js'|ezdesign()} ></script>
 <link rel="stylesheet" type="text/css" href={'stylesheets/ezdebug/objinspect.css'|ezdesign()} />
