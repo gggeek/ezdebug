@@ -176,14 +176,28 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		sb[sb.length] = '<td';
 		// sb[sb.length] = ' onselectstart="return false"';
 		sb[sb.length] = ' id="' + this.getToggleElId() + '"';
-		sb[sb.length] = ' class="' + this.getStyle() + '"';
-		if (this.hasChildren(true)) {
-			sb[sb.length] = ' onmouseover="this.className=';
+/// @todo this should not be true for root of trees, eg. when dumping an empty array
+		if (!this.hasChildren(true) && !isScalar(this.data.type)) {
+    		// an array or obj to be fetched via ajax
+    		sb[sb.length] = ' class="ygtvlp"';
+/// @todo fix hovers
+			/*sb[sb.length] = ' onmouseover="this.className=';
 			sb[sb.length] = getNode + '.getHoverStyle()"';
 			sb[sb.length] = ' onmouseout="this.className=';
-			sb[sb.length] = getNode + '.getStyle()"';
+			sb[sb.length] = getNode + '.getStyle()"';*/
+    		sb[sb.length] = ' onclick="javascript: YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ').drillDown(\'\')">';
 		}
-		sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
+		else
+		{
+    		sb[sb.length] = ' class="' + this.getStyle() + '"';
+    		if (this.hasChildren(true)) {
+    			sb[sb.length] = ' onmouseover="this.className=';
+    			sb[sb.length] = getNode + '.getHoverStyle()"';
+    			sb[sb.length] = ' onmouseout="this.className=';
+    			sb[sb.length] = getNode + '.getStyle()"';
+    		}
+    		sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
+		}
 
 		/*
 		sb[sb.length] = '<img id="' + this.getSpacerId() + '"';
@@ -244,12 +258,10 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		sb[sb.length] = ' class="' + this.labelStyle + 't"';
 
 		matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
-		if (matches != null)
-		{
+		if (matches != null) {
 		    sb[sb.length] = ' >['+matches[1]+'(<a href="'+ezdebug_objdocroot+matches[2]+'" target="_blank">'+matches[2]+'</a>)]</span>';
 		}
-		else
-		{
+		else {
 		    sb[sb.length] = ' >['+this.data.type+']</span>';
 		}
 		sb[sb.length] = '</td>';
@@ -285,7 +297,53 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		var newNode = new YAHOO.widget.eZDebugNode(rootdata, root, true, null, true);
 		tree.removeNode(root.children[0]);
 		tree.draw();
-	}
+	},
+
+	/**
+	 recursive function: go up parents chain until we find a valid persistent obj
+	 and then let him do the js call, leaving up to the original node to continue
+	 the work of injecting nodes upon js callback
+	*/
+	drillDown: function(childAttributepath, originalNodeID) {
+        if (originalNodeID === undefined ) {
+            originalNodeID = this.index;
+        }
+	    if (this.data.keys === undefined ) {
+    	    if (this.parent.drillDown !== undefined ) {
+    	        return this.parent.drillDown('::'+this.html+childAttributepath, originalNodeID);
+    	    }
+	    }
+	    else {
+	        matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
+	        /// @todo test if we match
+            var postData = 'ezjscServer_function_arguments=' + 'ezp::inspect::' + matches[2] + '::' + this.data.keys + childAttributepath;
+            //alert(postData);
+            //alert(ezjscore_url);
+            YAHOO.util.Connect.asyncRequest('POST', ezjscore_url, {
+                'success':  function(o) {
+                    //alert(o.responseText);
+                    try {
+                        var response = YAHOO.lang.JSON.parse(o.responseText);
+                        if (response.error_text === undefined || response.content === undefined) {
+                            alert('Invalid date received from server via ajax call (invalid json structure)');                        }
+                        else if (response.error_text != "") {
+                            alert(response.error_text);
+                        }
+                        else {
+                            //...
+                        }
+                    } catch(e) {
+                        alert('Invalid date received from server via ajax call (not json?)');
+                    }
+
+                },
+                'failure': function(o) {
+                    alert(o.statusText);
+                },
+                'argument': []
+            }, postData);
+	    }
+	},
 
 });
 
