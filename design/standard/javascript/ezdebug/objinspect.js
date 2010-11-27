@@ -7,12 +7,8 @@
  * @copyright (C) Gaetano Giunta 2010
  * @license code licensed under the GPL License: see README
  *
- * @todo smarter tree redawing: rebuild only the subtree needed
- * @todo find a smarter way to keep tooltips appearing after node buttons have been hidden + shown again...
- * @todo rewrite manipulation of values functions using indexOf(). In case of IE, Array has been extended...
  * @todo the tree preloads the standard tree images (via stylesheet). we should do the same for our custom images
- * @todo restrict tabbing to stay in dlg component, plus do not accept ESC, ENTER when on select box
- * @todo reduce the number of global variables
+ * @todo use a 'loading' icon while ajax call is executing
  */
 
 /**
@@ -22,18 +18,18 @@
  * @class eZDebugNode
  * @extends YAHOO.widget.Node
  * @constructor
- * @param oData {object} an object containing the data that will
- * be used to render this node
+ * @param oData {object} an object containing the data that will be used
+ *        to render this node
  * @param oParent {YAHOO.widget.Node} this node's parent node
  * @param expanded {boolean} the initial expanded/collapsed state
  * @param name {string} the string label attached to this node (for struct member nodes)
- * @param editable {boolean} if true, allow modifications to element
  */
 YAHOO.widget.eZDebugNode = function(oData, oParent, expanded, name) {
 
 	if (oData) {
 		this.init(oData, oParent, expanded);
-		this.initContent(oData, expanded, name);
+		this.setUpLabel(name);
+		eZDebugNode_initChildren(this, oData, expanded);
 	}
 
 };
@@ -49,22 +45,22 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 	labelStyle: "ygtvlabel",
 
 	/**
-	 * The derived element ids of the label for this node
+	 * The derived element ids of html elements inside the label for this node
 	 * @type string
 	 */
+	nameElId: null,
 	labelElId: null,
 	typeElId: null,
-	nameElId: null,
 
 	/**
-	 * The text for the element name (used for painting struct val children elements).
+	 * The text for the element name (used for hash elements and objects members).
 	 * @property html
 	 * @type string
 	 */
 	html: null,
 
 
-	/// @todo: verify if this is used or it can be ripped off; nothing happens normally when clicking on label (editing is done by clickig on icons...)
+	/// @todo: verify if this is used or it can be ripped off; nothing happens normally when clicking on label
 	textNodeParentChange: function() {
 
 		/**
@@ -84,52 +80,24 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 	},
 
 	/**
-	 * Sets up the node, fetching data from the struct oData. Recurses children!
+	 * Sets up the node label
 	 * @method setUpLabel
-	 * @param oData an anon object
+	 * @param name {string}
 	 */
-	initContent: function(oData, expanded, name) {
+	setUpLabel: function(name) {
 
 		// set up the custom event on the tree
 		this.textNodeParentChange();
 		this.subscribe("parentChange", this.textNodeParentChange);
 
-		/*if (typeof oData == "string") {
-			oData = { label: oData };
-		}
-		this.label = oData.label;*/
-
-		// 'name' of element is not a property of the oData value, so we copy it into the node to display it later
-		// note that we distinguish an empty name, ie. '' from a no-name element!!!
+		// 'name' of element is not a property of the oData value stored in this.data,
+		// so we copy it into the node to display it later
+		// note that we might distinguish (?) an empty name, ie. '' from a no-name element!!!
 		if (name === undefined || name === null) {
 			this.html = false;
 		}
 		else {
 			this.html = name;
-		}
-
-		// build recursively all children nodes if this xmlrpcval object is array or hash or obj
-		if (oData.type.slice(0, 5) == 'array') {
-			if (oData.value !== null)
-			{
-				for (var i = 0; i < oData.value.length; i++) {
-					var newnode = new YAHOO.widget.eZDebugNode(oData.value[i], this, expanded, null);
-				}
-			}
-			//this.html = '<b>[array]</b>';
-			//this.html = oName;
-		}
-		else if (oData.type.slice(0, 6) == 'hash' || oData.type.slice(0, 6) == 'object' ) {
-			/// @todo implement data hiding (???)
-			for (var attr in oData.value) {
-				var newnode = new YAHOO.widget.eZDebugNode(oData.value[attr], this, expanded, attr);
-			}
-			//this.html = '<b>[struct]</b>';
-			//this.html = oName;
-		}
-		else {
-			//this.html = oData.me+' <b>['+oData.scalartyp()+']</b>';
-			//this.html = oName + oData.me;
 		}
 
 		// save Ids of elements that could see their content modified later on
@@ -169,36 +137,34 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 			sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '"><div class="ygtvspacer"></div></td>';
 		}
 
-		var getNode = 'YAHOO.widget.TreeView.getNode(\'' +
-						this.tree.id + '\',' + this.index + ')';
-
-		// node icon
+		// node icon (+/- for containers, or a spacer)
 		sb[sb.length] = '<td';
 		// sb[sb.length] = ' onselectstart="return false"';
 		sb[sb.length] = ' id="' + this.getToggleElId() + '"';
 /// @todo this should not be true for root of trees, eg. when dumping an empty array
-		if (!this.hasChildren(true) && !isScalar(this.data.type)) {
-    		// an array or obj to be fetched via ajax
-    		sb[sb.length] = ' class="ygtvlp"';
+		if (!this.hasChildren(true) && !this.isScalar(this.data.type)) {
+			// an array or obj to be fetched via ajax
+			sb[sb.length] = ' class="ygtvlp"';
 /// @todo fix hovers
 			/*sb[sb.length] = ' onmouseover="this.className=';
 			sb[sb.length] = getNode + '.getHoverStyle()"';
 			sb[sb.length] = ' onmouseout="this.className=';
 			sb[sb.length] = getNode + '.getStyle()"';*/
-    		sb[sb.length] = ' onclick="javascript: YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ').drillDown(\'\')">';
+			sb[sb.length] = ' onclick="javascript: YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ').drillDown(\'\')">';
 		}
 		else
 		{
-    		sb[sb.length] = ' class="' + this.getStyle() + '"';
-    		if (this.hasChildren(true)) {
-    			sb[sb.length] = ' onmouseover="this.className=';
-    			sb[sb.length] = getNode + '.getHoverStyle()"';
-    			sb[sb.length] = ' onmouseout="this.className=';
-    			sb[sb.length] = getNode + '.getStyle()"';
-    		}
-    		sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
+			sb[sb.length] = ' class="' + this.getStyle() + '"';
+			if (this.hasChildren(true)) {
+				var getNode = 'YAHOO.widget.TreeView.getNode(\'' +
+					this.tree.id + '\',' + this.index + ')';
+				sb[sb.length] = ' onmouseover="this.className=';
+				sb[sb.length] = getNode + '.getHoverStyle()"';
+				sb[sb.length] = ' onmouseout="this.className=';
+				sb[sb.length] = getNode + '.getStyle()"';
+			}
+			sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
 		}
-
 		/*
 		sb[sb.length] = '<img id="' + this.getSpacerId() + '"';
 		sb[sb.length] = ' alt=""';
@@ -227,7 +193,7 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		}
 
 		// add data value, unless array or struct
-		if (isScalar(this.data.type)) {
+		if (this.isScalar(this.data.type)) {
 			sb[sb.length] = '<span';
 			sb[sb.length] = ' id="' + this.labelElId + '"';
 			// if this value has been built out of a NULL/UNDEF js value, but with a correct type,
@@ -254,15 +220,13 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		sb[sb.length] = ' >['+this.data.scalartyp()+']</a>';*/
 		sb[sb.length] = ' <span';
 		sb[sb.length] = ' id="' + this.typeElId + '"';
-
 		sb[sb.length] = ' class="' + this.labelStyle + 't"';
-
-		matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
+		var matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
 		if (matches != null) {
-		    sb[sb.length] = ' >['+matches[1]+'(<a href="'+ezdebug_objdocroot+matches[2]+'" target="_blank">'+matches[2]+'</a>)]</span>';
+			sb[sb.length] = ' >['+matches[1]+'(<a href="'+ezdebug_objdocroot+matches[2]+ezdebug_objdocsuffix+'" target="_blank">'+matches[2]+'</a>)]</span>';
 		}
 		else {
-		    sb[sb.length] = ' >['+this.data.type+']</span>';
+			sb[sb.length] = ' >['+this.data.type+']</span>';
 		}
 		sb[sb.length] = '</td>';
 		sb[sb.length] = '</tr>';
@@ -283,72 +247,105 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 	},
 
 	toString: function() {
-		//return "eZDebugNode (" + this.index + ") " + this.label;
-		var out = "eZDebugNode (" + this.index + ") (" + this.children.length + ") [ ";
-		for (var i = 0; i < this.children.length; ++i)
-		  out = out + this.children[i].toString() + ',';
-		return out + ' ]';
-	},
-
-	reloadTree: function() {
-		var tree = this.tree;
-		var root = tree.getRoot();
-		var rootdata = root.children[0].data;
-		var newNode = new YAHOO.widget.eZDebugNode(rootdata, root, true, null, true);
-		tree.removeNode(root.children[0]);
-		tree.draw();
+		var out = "eZDebugNode (" + this.index + ")";
+		if (this.children.length) {
+    		out = out + " [ ";
+    		for (var i = 0; i < this.children.length; ++i)
+        		out = out + /*i + ': ' +*/ this.children[i].toString() + ', ';
+    		out = out + ']';
+		}
+		return out;
 	},
 
 	/**
 	 recursive function: go up parents chain until we find a valid persistent obj
 	 and then let him do the js call, leaving up to the original node to continue
-	 the work of injecting nodes upon js callback
+	 the work of injecting nodes in the tree upon js callback
 	*/
 	drillDown: function(childAttributepath, originalNodeID) {
-        if (originalNodeID === undefined ) {
-            originalNodeID = this.index;
-        }
-	    if (this.data.keys === undefined ) {
-    	    if (this.parent.drillDown !== undefined ) {
-    	        return this.parent.drillDown('::'+this.html+childAttributepath, originalNodeID);
-    	    }
-	    }
-	    else {
-	        matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
-	        /// @todo test if we match
-            var postData = 'ezjscServer_function_arguments=' + 'ezp::inspect::' + matches[2] + '::' + this.data.keys + childAttributepath;
-            //alert(postData);
-            //alert(ezjscore_url);
-            YAHOO.util.Connect.asyncRequest('POST', ezjscore_url, {
-                'success':  function(o) {
-                    //alert(o.responseText);
-                    try {
-                        var response = YAHOO.lang.JSON.parse(o.responseText);
-                        if (response.error_text === undefined || response.content === undefined) {
-                            alert('Invalid date received from server via ajax call (invalid json structure)');                        }
-                        else if (response.error_text != "") {
-                            alert(response.error_text);
-                        }
-                        else {
-                            //...
-                        }
-                    } catch(e) {
-                        alert('Invalid date received from server via ajax call (not json?)');
-                    }
+		if (originalNodeID === undefined ) {
+			originalNodeID = this.index;
+		}
+		if (this.data.keys === undefined ) {
+    		// drillDown is undefined when we are at the tree root
+			if (this.parent.drillDown !== undefined ) {
+				return this.parent.drillDown('::'+this.html+childAttributepath, originalNodeID);
+			}
+		}
+		else {
+			var matches = /^([^\[(]+)[\[(]([^\])]+)[\])]$/.exec(this.data.type);
+			/// @todo test if we match (even though we always should)
+			var postData = 'ezjscServer_function_arguments=' + 'ezp::inspect::' + matches[2] + '::' + this.data.keys + childAttributepath;
+			YAHOO.util.Connect.asyncRequest('POST', ezjscore_url, {
 
-                },
-                'failure': function(o) {
-                    alert(o.statusText);
-                },
-                'argument': []
-            }, postData);
-	    }
+				'success': function(o) {
+					try {
+						var response = YAHOO.lang.JSON.parse(o.responseText);
+						if (response.error_text === undefined || response.content === undefined) {
+							alert('Invalid date received from server via ajax call (invalid json structure)');
+						}
+						else if (response.error_text != "") {
+							alert(response.error_text);
+						}
+						else {
+							/// @todo (!important) could we rely on closures instead of using o.argument?
+							var tree = o.argument.triggeringNode.tree;
+							var origin = tree.getNodeByIndex(o.argument.originalNodeID);
+							try
+							{
+    							/// @todo (!important) check if response.type matches origin.data.type
+								eZDebugNode_initChildren(origin, response.content, false);
+								tree.draw();
+							} catch(e) {
+								alert('Error adding new nodes to YUI tree ');
+							}
+						}
+					} catch(e) {
+						alert('Invalid date received from server via ajax call (not json?) ' + o.responseText);
+					}
+				},
+
+				'failure': function(o) {
+					alert(o.statusText);
+				},
+
+				'argument': {'originalNodeID': originalNodeID, 'triggeringNode': this}
+			}, postData);
+		}
 	},
+
+	isScalar: function(value) {
+    	return value.slice(0, 4) != 'hash' && value.slice(0, 5) != 'array' && value.slice(0, 6) != 'object';
+    }
 
 });
 
-function isScalar(value) {
-	return value.slice(0, 4) != 'hash' && value.slice(0, 5) != 'array' && value.slice(0, 6) != 'object';
+// build recursively all children nodes if this object is array or hash or obj
+// moved here because of mysterious problem in adding it to eZDebugNode via Yahoo extend...
+function eZDebugNode_initChildren (node, oData, expanded) {
+
+	if (oData.type.slice(0, 5) == 'array') {
+		if (oData.value !== null)
+		{
+			for (var i = 0; i < oData.value.length; i++) {
+				var newnode = new YAHOO.widget.eZDebugNode(oData.value[i], node, expanded, null);
+			}
+		}
+		//this.html = '<b>[array]</b>';
+		//this.html = oName;
+	}
+	else if (oData.type.slice(0, 4) == 'hash' || oData.type.slice(0, 6) == 'object' ) {
+		/// @todo implement data hiding (???)
+		for (var attr in oData.value) {
+			var newnode = new YAHOO.widget.eZDebugNode(oData.value[attr], node, expanded, attr);
+		}
+		//this.html = '<b>[struct]</b>';
+		//this.html = oName;
+	}
+	else {
+		//this.html = oData.me+' <b>['+oData.scalartyp()+']</b>';
+		//this.html = oName + oData.me;
+	}
 }
 
 /* for those poor browsers that have a lacking JS implementation, we provide JS 1.5 compat.... */

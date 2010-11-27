@@ -36,7 +36,9 @@
     var ezdebug_trees = [];
     var ezdebug_nodes = [];
     {*var ezdebug_sdkversion = '{$sdkversion}';*}
+    /// @todo read this from an ini file to support local manuals
     var ezdebug_objdocroot = 'http://doc.ez.no/eZ-Publish/Technical-manual/4.x/Reference/Objects/';
+    ezdebug_objdocsuffix = '';
     var ezjscore_url = '{'ezjscore/call/?ContentType=json'|ezurl(no, full)}';
 </script>
 {undef $preferred_version}
