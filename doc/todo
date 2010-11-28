@@ -1,14 +1,10 @@
+objInspect operator:
+. add ini file w. location of ezpo docs (online or local repos)
+. add ini file w. version of yui to use, test using 2.8.1
+. support using jsonrpc instead of jquery if ezjscore is not installed but ggwebservices is
+. show a friendly error msg if none of the two is loaded (can be tested in tpl code)
+. show a loading icon while ajax calls are executing (use yui dynamic tree)
 . remove unused images and corresponding styles in css
-
-. decide how to fix yui2 vs yui3 problem:
-  . treeview is in yui2 but not in 3
-  . Y.io is in yui3 but not in 2
-  . ezjscore is not in ezp 4.0 or 4.1 anyway (but version 1.2 can be downloaded and installed from projects.ez.no)
-
-a- move to yui3 + the 2-in-3 loading (needs yui >= 310)
-b- stay w. yui2 and port Y.io.ez to yui2
-c- move to other ajax libs
-
 . make js loading more friendly to yui:
-  if ezjscore is found, leave it up to yui to load the js
-  otherwise do it by ourselves
+  if ezjscore is found, leave it up to yui to load the js,
+  otherwise do it by ourselves (need the 2-in-3 yui hacks)

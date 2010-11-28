@@ -8,7 +8,8 @@
  * @license code licensed under the GPL License: see README
  *
  * @todo the tree preloads the standard tree images (via stylesheet). we should do the same for our custom images
- * @todo use a 'loading' icon while ajax call is executing
+ * @todo use a 'loading' icon while ajax call is executing => use 'dynamic' property of YUI tree to get it
+         and at the same time better support for empty obj attributes
  */
 
 /**
@@ -133,7 +134,6 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 
 		// spacing for node depth
 		for (var i = 0; i < this.depth; ++i) {
-			// sb[sb.length] = '<td class="ygtvdepthcell">&#160;</td>';
 			sb[sb.length] = '<td class="' + this.getDepthStyle(i) + '"><div class="ygtvspacer"></div></td>';
 		}
 
@@ -141,19 +141,25 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		sb[sb.length] = '<td';
 		// sb[sb.length] = ' onselectstart="return false"';
 		sb[sb.length] = ' id="' + this.getToggleElId() + '"';
-/// @todo this should not be true for root of trees, eg. when dumping an empty array
 		if (!this.hasChildren(true) && !this.isScalar(this.data.type)) {
-			// an array or obj to be fetched via ajax
-			sb[sb.length] = ' class="ygtvlp"';
-/// @todo fix hovers
-			/*sb[sb.length] = ' onmouseover="this.className=';
-			sb[sb.length] = getNode + '.getHoverStyle()"';
-			sb[sb.length] = ' onmouseout="this.className=';
-			sb[sb.length] = getNode + '.getStyle()"';*/
-			sb[sb.length] = ' onclick="javascript: YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ').drillDown(\'\')">';
+			if (this.depth == 0 && (this.data.type == 'hash' || this.data.type == 'array')) {
+				// an empty top-level array/hash
+				sb[sb.length] = ' class="ygtvlm">';
+			}
+			else
+			{
+				// an array or obj to be fetched via ajax
+				sb[sb.length] = ' class="ygtvlp"';
+				sb[sb.length] = ' onmouseover="this.className=\'ygtvlph\'"';
+				//sb[sb.length] = getNode + '.getHoverStyle()"';
+				sb[sb.length] = ' onmouseout="this.className=\'ygtvlp\'"';
+				//sb[sb.length] = getNode + '.getStyle()"';
+				sb[sb.length] = ' onclick="javascript: YAHOO.widget.TreeView.getNode(\'' + this.tree.id + '\',' + this.index + ').drillDown(\'\')">';
+			}
 		}
 		else
 		{
+			// either a scalar or we have children
 			sb[sb.length] = ' class="' + this.getStyle() + '"';
 			if (this.hasChildren(true)) {
 				var getNode = 'YAHOO.widget.TreeView.getNode(\'' +
@@ -165,17 +171,6 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 			}
 			sb[sb.length] = ' onclick="javascript:' + this.getToggleLink() + '">';
 		}
-		/*
-		sb[sb.length] = '<img id="' + this.getSpacerId() + '"';
-		sb[sb.length] = ' alt=""';
-		sb[sb.length] = ' tabindex=0';
-		sb[sb.length] = ' src="' + this.spacerPath + '"';
-		sb[sb.length] = ' title="' + this.getStateText() + '"';
-		sb[sb.length] = ' class="ygtvspacer"';
-		// sb[sb.length] = ' onkeypress="return ' + getNode + '".onKeyPress()"';
-		sb[sb.length] = ' />';
-		*/
-		//sb[sb.length] = '&#160;';
 		sb[sb.length] = '<div class="ygtvspacer"/>';
 		sb[sb.length] = '</td>';
 
@@ -196,13 +191,6 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		if (this.isScalar(this.data.type)) {
 			sb[sb.length] = '<span';
 			sb[sb.length] = ' id="' + this.labelElId + '"';
-			// if this value has been built out of a NULL/UNDEF js value, but with a correct type,
-			// display it using a different class, so that user is alerted of it
-/*			if ((this.data.scalarTyp() != 'null' && this.data.scalarTyp().slice(0, 5) != 'undef') &&
-				(this.data.me === null)) {
-				sb[sb.length] = ' class="' + this.labelStyle + 'u"';
-			}
-			else {*/
 			sb[sb.length] = ' class="' + this.labelStyle + '"';
 			if (this.data.type == 'string') {
 				sb[sb.length] = ' >"'+this.data.value+'"</span>';
@@ -214,10 +202,6 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		}
 
 		// add indicator of type of data
-		/*sb[sb.length] = ' <a href="#"';
-		sb[sb.length] = ' id="' + this.typeElId + '"';
-		sb[sb.length] = ' onclick="return ' + getNode + '.onTypeClick(' + getNode +')"';
-		sb[sb.length] = ' >['+this.data.scalartyp()+']</a>';*/
 		sb[sb.length] = ' <span';
 		sb[sb.length] = ' id="' + this.typeElId + '"';
 		sb[sb.length] = ' class="' + this.labelStyle + 't"';
@@ -249,10 +233,10 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 	toString: function() {
 		var out = "eZDebugNode (" + this.index + ")";
 		if (this.children.length) {
-    		out = out + " [ ";
-    		for (var i = 0; i < this.children.length; ++i)
-        		out = out + /*i + ': ' +*/ this.children[i].toString() + ', ';
-    		out = out + ']';
+			out = out + " [ ";
+			for (var i = 0; i < this.children.length; ++i)
+				out = out + /*i + ': ' +*/ this.children[i].toString() + ', ';
+			out = out + ']';
 		}
 		return out;
 	},
@@ -266,10 +250,21 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		if (originalNodeID === undefined ) {
 			originalNodeID = this.index;
 		}
+		// pos have the 'keys' element set
 		if (this.data.keys === undefined ) {
-    		// drillDown is undefined when we are at the tree root
+			// drillDown is undefined when we are at the tree root
 			if (this.parent.drillDown !== undefined ) {
 				return this.parent.drillDown('::'+this.html+childAttributepath, originalNodeID);
+			}
+			else
+			{
+				// at root of tree, and no po found: the original array/hash is really
+				// meant to be empty
+				var originToggle = this.tree.getNodeByIndex(originalNodeID).getToggleEl();
+				originToggle.onmouseover = null;
+				originToggle.onmouseout = null;
+				originToggle.onclick = null;
+				originToggle.className = 'ygtvlm';
 			}
 		}
 		else {
@@ -293,9 +288,18 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 							var origin = tree.getNodeByIndex(o.argument.originalNodeID);
 							try
 							{
-    							/// @todo (!important) check if response.type matches origin.data.type
-								eZDebugNode_initChildren(origin, response.content, false);
-								tree.draw();
+								/// @todo (!important) check if response.type matches origin.data.type
+								if (origin.isEmpty(response.content.value)) {
+									var originToggle = origin.getToggleEl();
+									originToggle.onmouseover = null;
+									originToggle.onmouseout = null;
+									originToggle.onclick = null;
+									originToggle.className = 'ygtvlm';
+								}
+								else {
+									eZDebugNode_initChildren(origin, response.content, false);
+									tree.draw();
+								}
 							} catch(e) {
 								alert('Error adding new nodes to YUI tree ');
 							}
@@ -315,8 +319,19 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 	},
 
 	isScalar: function(value) {
-    	return value.slice(0, 4) != 'hash' && value.slice(0, 5) != 'array' && value.slice(0, 6) != 'object';
-    }
+		return value.slice(0, 4) != 'hash' && value.slice(0, 5) != 'array' && value.slice(0, 6) != 'object';
+	},
+
+	// test arrays and structs for emptyness
+	isEmpty: function(value) {
+		if ( (value instanceof Array) && value.length > 0 ) {
+			return false;
+		}
+		for (var attr in value) {
+			return false;
+		}
+		return true;
+	}
 
 });
 
@@ -331,20 +346,12 @@ function eZDebugNode_initChildren (node, oData, expanded) {
 				var newnode = new YAHOO.widget.eZDebugNode(oData.value[i], node, expanded, null);
 			}
 		}
-		//this.html = '<b>[array]</b>';
-		//this.html = oName;
 	}
 	else if (oData.type.slice(0, 4) == 'hash' || oData.type.slice(0, 6) == 'object' ) {
 		/// @todo implement data hiding (???)
 		for (var attr in oData.value) {
 			var newnode = new YAHOO.widget.eZDebugNode(oData.value[attr], node, expanded, attr);
 		}
-		//this.html = '<b>[struct]</b>';
-		//this.html = oName;
-	}
-	else {
-		//this.html = oData.me+' <b>['+oData.scalartyp()+']</b>';
-		//this.html = oName + oData.me;
 	}
 }
 
