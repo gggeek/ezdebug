@@ -1,4 +1,5 @@
 objInspect operator:
+. allow user to see object attributes sorted alphabetically
 . test using YUI 2.8.1
 . show a friendly error msg if user has no access rights to ws calls (can be tested before ws call is actually made)
 . move to usage of a yui dynamic tree instead of all hardcoded style/event changes for nodes
@@ -6,4 +7,4 @@ objInspect operator:
 . make js loading more friendly to yui:
   if ezjscore is found, leave it up to yui to load the js,
   otherwise do it by ourselves (need the 2-in-3 yui hacks)
-. use doc from ezpersisentobject_inspector extension if it is installed
+. use doc from ezpersisentobject_inspector extension (how?)

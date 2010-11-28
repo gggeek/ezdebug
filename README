@@ -1,6 +1,51 @@
 eZDebug extension for eZ publish
 ===================================
 
+Putting the fun back into eZ Publish debugging: new template operators for the
+developer.
+
+
+License
+=======
+GNU General Public License v2.0
+
+
+Requirements
+============
+o  eZ publish version: Make sure you use eZ publish version 4.0 or higher.
+o  PHP version: as indicated in your eZ publish version requirements
+o  Web Browser: no spcific requirements
+o  For the objInspect operator to work, 3 other extensions are necessary:
+   . ezpersistentobject_inspector
+   . ezwebservicesapi, which in turns needs either one of
+   . ezjscore or ggwebservices
+
+
+Installation
+============
+
+1. Make sure you match the requirements stated above
+
+2. Standard eZ Publish extension installation method:
+   - copy the files from the zip under the extension directory
+   - activate the extension either via the admin interface or by editing site.ini.append.php + regenerating autoloads
+
+3. for the objInspect operator to work, give to the user account that you use
+   for debugging access to the either one of the following policies:
+   . webservices/execute (limitation: ezp.inspect)
+   . ezjscore/call (no limitation)
+
+  ### ATTENTION! ###
+  
+  Remove this policy in production, as it allows the grantee to access any
+  information in the eZ Publish database, including eg. user accounts and sessions.
+
+  ### ATTENTION! ###
+
+
+Usage
+=====
+
 This extension adds 5 new template operators:
  eZDebug
  objDebug
@@ -66,29 +111,6 @@ Example usage:
 {$unknown_object_here)|objDebug()}
 
 {concat('Queries executed so far: ',numQueries())|eZDebug()}
-
-
-License
-=======
-GNU General Public License v2.0
-
-
-Requirements
-============
-o  eZ publish version: Make sure you use eZ publish version 4.0 or higher.
-o  PHP version: as indicated in your eZ publish version requirements
-o  Web Browser: no spcific requirements
-o  For the objInspect operator to work, other extensions are necessary:
-   . ezpersistentobject_inspector
-   . ezwebservicesapi, which in turns needs either one of
-   . ezjscore or ggwebservices
-
-
-Installation
-============
-Standard eZ Publish extension installation method:
-- copy the files from the zip under the extension directory
-- activate the extension either via the admin interface or by editing site.ini.append.php + regenerating autoloads
 
 
 Troubleshooting
