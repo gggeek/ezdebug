@@ -16,8 +16,8 @@ o  eZ publish version: Make sure you use eZ publish version 4.0 or higher.
 o  PHP version: as indicated in your eZ publish version requirements
 o  Web Browser: no spcific requirements
 o  For the objInspect operator to work, 3 other extensions are necessary:
-   . ezpersistentobject_inspector
-   . ezwebservicesapi, which in turns needs either one of
+   . ezpersistentobject_inspector >= 0.2
+   . ezwebservicesapi >= 0.4, which in turns needs either one of
    . ezjscore or ggwebservices
 
 
@@ -99,7 +99,7 @@ prints in the debug logs instead of the middle of the web page.
 
 4) ''|numQueries( [cluster_db=false] )
 
-5) $value|objInspect()
+5) $value|objInspect( [sort_attributes=false] )
 
 
 Example usage:

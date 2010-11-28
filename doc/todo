@@ -1,5 +1,4 @@
 objInspect operator:
-. allow user to see object attributes sorted alphabetically
 . test using YUI 2.8.1
 . show a friendly error msg if user has no access rights to ws calls (can be tested before ws call is actually made)
 . move to usage of a yui dynamic tree instead of all hardcoded style/event changes for nodes

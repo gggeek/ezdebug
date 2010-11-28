@@ -6,6 +6,7 @@
  @param $counter a counter that should be incremented for every time this tpl is used
  @param $value the variable to be debugged
  @param $transport the ws library to be used. ggwebservices or ezjscore supported
+ @param $sort_attributes
 
  @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yui 2.8.1 (version in use in eZP 4.4)?
  @todo use smarter loading (ezjscore_based) for js & css files? nb: this tpl should work in any condition if possible
@@ -56,7 +57,6 @@
     {elseif eq($transport, 'ggwebservices')}
     var transport_url = '{'webservices/execute/jsonrpc'|ezurl(no, full)|wash(javascript)}';
     {/if}
-
 </script>
 {undef $preferred_packing $preferred_version}
 {/run-once}
@@ -66,9 +66,9 @@
     WARNING: this box is completely useless without javascript support.<br />Please use a javascript-enabled browser.
     </noscript>
 </div>
-
 <script type="text/javascript">
     ezdebug_trees[{$counter}] = new YAHOO.widget.TreeView('ezdebugparam{$counter}');
+    ezdebug_trees[{$counter}].sort_attributes = {if $sort_attributes}true{else}false{/if};
     ezdebug_nodes[{$counter}] = new YAHOO.widget.eZDebugNode({$value}, ezdebug_trees[{$counter}].getRoot(), true, null);
     ezdebug_trees[{$counter}].draw();
 </script>

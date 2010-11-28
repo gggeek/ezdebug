@@ -148,7 +148,7 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 			}
 			else
 			{
-				// an array or obj to be fetched via ajax
+				// an array or obj or 'any' to be fetched via ajax
 				sb[sb.length] = ' class="ygtvlp"';
 				sb[sb.length] = ' onmouseover="this.className=\'ygtvlph\'"';
 				//sb[sb.length] = getNode + '.getHoverStyle()"';
@@ -260,7 +260,7 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		if (this.data.keys === undefined ) {
 			// drillDown is undefined when we are at the tree root
 			if (this.parent.drillDown !== undefined ) {
-    			childAttributepath.unshift(this.html);
+				childAttributepath.unshift(this.html);
 				return this.parent.drillDown(childAttributepath, originalNodeID);
 			}
 			else {
@@ -274,86 +274,93 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 			/// @todo test if we match (even though we always should)
 			if (ezdebug_transport == 'ezjscore' || ezdebug_transport == 'ggwebservices') {
 
-    			// prevent double-clicks, and set a loading icon
-                this.beginDDRequest(originalNodeID);
+				// prevent double-clicks, and set a loading icon
+				this.beginDDRequest(originalNodeID);
 
-    			if (ezdebug_transport == 'ezjscore') {
-        			var postData = 'ezjscServer_function_arguments=' + 'ezp::inspeczt::' + matches[2] + '::' + this.data.keys + '::' + childAttributepath.join('::');
-        		}
-        		else {
-            		var params = new Array(matches[2], this.data.keys).concat(childAttributepath);
-            		var postData = YAHOO.lang.JSON.stringify({"method":"ezp.inspect", "params":params, "id":1});
-        		}
-    			YAHOO.util.Connect.asyncRequest('POST', transport_url, {
+				if (ezdebug_transport == 'ezjscore') {
+					var postData = 'ezjscServer_function_arguments=' + 'ezp::inspect::' + matches[2] + '::' + this.data.keys + '::' + childAttributepath.join('::');
+				}
+				else {
+					var params = new Array(matches[2], this.data.keys).concat(childAttributepath);
+					var postData = YAHOO.lang.JSON.stringify({"method":"ezp.inspect", "params":params, "id":1});
+				}
+				YAHOO.util.Connect.asyncRequest('POST', transport_url, {
 
-    				'success': function(o) {
-    					try {
-    						var response = YAHOO.lang.JSON.parse(o.responseText);
+					'success': function(o) {
+						try {
+							var response = YAHOO.lang.JSON.parse(o.responseText);
 
-                			if (ezdebug_transport == 'ezjscore') {
-        						if (response.error_text === undefined || response.content === undefined) {
-        							alert('Invalid date received from server via ajax call (invalid json structure)');
-        							o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
-        							return;
-        						}
-        						else if (response.error_text != "") {
-        							alert(response.error_text);
-        							o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
-        							return;
-        						}
-        						else {
-            						response = response.content;
-        						}
-                			}
-                			else { // ggwebserices
-          						if (response.result === undefined || response.error === undefined || response.id === undefined) {
-        							alert('Invalid date received from server via ajax call (invalid json structure)');
-        							o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
-        							return;
-        						}
-        						else if (response.error != null) {
-        							alert(response.error);
-        							o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
-        							return;
-        						}
-        						else {
-            						response = response.result;
-        						}
-                			}
+							if (ezdebug_transport == 'ezjscore') {
+								if (response.error_text === undefined || response.content === undefined) {
+									alert('Invalid date received from server via ajax call (invalid json structure)');
+									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									return;
+								}
+								else if (response.error_text != "") {
+									alert(response.error_text);
+									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									return;
+								}
+								else {
+									response = response.content;
+								}
+							}
+							else { // ggwebserices
+		  						if (response.result === undefined || response.error === undefined || response.id === undefined) {
+									alert('Invalid date received from server via ajax call (invalid json structure)');
+									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									return;
+								}
+								else if (response.error != null) {
+									alert(response.error);
+									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									return;
+								}
+								else {
+									response = response.result;
+								}
+							}
 
-   							/// @todo (!important) could we rely on closures instead of using o.argument?
-   							var tree = o.argument.triggeringNode.tree;
-   							var origin = tree.getNodeByIndex(o.argument.originalNodeID);
-   							try
-   							{
-   								/// @todo (!important) check if response.type matches origin.data.type
-   								if (origin.isEmpty(response.value)) {
-       								origin.endDDRequest(null, true);
-   								}
-   								else {
-   									eZDebugNode_initChildren(origin, response, false);
-   									tree.draw();
-   								}
-   							} catch(e) {
-   								alert('Error adding new nodes to YUI tree');
-   								o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, true);
-   							}
+							/// @todo (!important) could we rely on closures instead of using o.argument?
+							var tree = o.argument.triggeringNode.tree;
+							var origin = tree.getNodeByIndex(o.argument.originalNodeID);
+							try {
+								/// @todo (!important) check if response.type matches origin.data.type
+								///	   nb: must be true unless origin.data.type = any
+								if (origin.data.type == 'any') {
+									// previously unknown type: set it
+									origin.data.type = response.type;
+									origin.data.value = response.value;
+								}
+								if (origin.isEmpty(response.value)) {
+									origin.endDDRequest(null, true);
+								}
+								else {
+									eZDebugNode_initChildren(origin, response, false);
+									tree.draw();
+								}
+							} catch(e) {
+								alert('Error adding new nodes to YUI tree');
+								/// @todo test if in exception we can still access o.argument.triggeringNode.endDDrequest
+								o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, true);
+							}
 
-    					} catch(e) {
-    						alert('Invalid date received from server via ajax call (not json?) ' + o.responseText.substr(0, 1000));
-    						o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, false);
-    					}
-    				},
+						} catch(e) {
+							alert('Invalid data received from server via ajax call (not json?) ' + o.responseText.substr(0, 1000));
+							/// @todo test if in exception we can still access o.argument.triggeringNode.endDDrequest
+							o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, false);
+						}
+					},
 
-    				'failure': function(o) {
-    					alert(o.statusText);
-    					o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, false);
-    				},
+					'failure': function(o) {
+						alert(o.statusText);
+						o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, false);
+					},
 
-    				'argument': {'originalNodeID': originalNodeID, 'triggeringNode': this}
-    			}, postData);
+					'argument': {'originalNodeID': originalNodeID, 'triggeringNode': this}
+				}, postData);
 			} else {
-    			alert('Cannot drill down: a webservices extension need to be enabled (ezjscore or ggwebservices)');
+				alert('Cannot drill down: a webservices extension need to be enabled (ezjscore or ggwebservices)');
 			}
 		}
 	},
@@ -369,34 +376,35 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 
 	/// restore event handlers, icon to 'loading' to specified node. If node unspecified, use current one
 	endDDRequest: function(originalNodeID, opened) {
-    	if ( originalNodeID != null ) {
-    	    var originToggle = this.tree.getNodeByIndex(originalNodeID).getToggleEl();
-    	}
-    	else {
-        	var originToggle = this.getToggleEl();
-        	originalNodeID = this.index;
-    	}
-		if (opened) {
-    		originToggle.onmouseover = null;
-    		originToggle.onmouseout = null;
-    		originToggle.onclick = null;
-    		originToggle.className = 'ygtvlm';
+		if ( originalNodeID != null ) {
+			var originToggle = this.tree.getNodeByIndex(originalNodeID).getToggleEl();
 		}
 		else {
-    		originToggle.onmouseover = 'this.className="ygtvlph"';
-    		originToggle.onmouseout = 'this.className="ygtvlp"';
-    		var treeId = this.tree.id;
-    		originToggle.onclick = function(){YAHOO.widget.TreeView.getNode(treeId, originalNodeID).drillDown([])}
-    		originToggle.className = 'ygtvlp';
+			var originToggle = this.getToggleEl();
+			originalNodeID = this.index;
+		}
+		if (opened) {
+			originToggle.onmouseover = null;
+			originToggle.onmouseout = null;
+			originToggle.onclick = null;
+			originToggle.className = 'ygtvlm';
+		}
+		else {
+			originToggle.onmouseover = 'this.className="ygtvlph"';
+			originToggle.onmouseout = 'this.className="ygtvlp"';
+			var treeId = this.tree.id;
+			originToggle.onclick = function(){YAHOO.widget.TreeView.getNode(treeId, originalNodeID).drillDown([])}
+			originToggle.className = 'ygtvlp';
 		}
 
 	},
 
 	isScalar: function(value) {
-		return value.slice(0, 4) != 'hash' && value.slice(0, 5) != 'array' && value.slice(0, 6) != 'object';
+		return value.slice(0, 4) != 'hash' && value.slice(0, 5) != 'array' &&
+		value.slice(0, 6) != 'object' && value.slice(0, 3) != 'any';
 	},
 
-	// test arrays and structs for emptyness
+	// test arrays and structs for emptyness. For scalars, returns true
 	isEmpty: function(value) {
 		if ( (value instanceof Array) && value.length > 0 ) {
 			return false;
@@ -414,17 +422,27 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 function eZDebugNode_initChildren (node, oData, expanded) {
 
 	if (oData.type.slice(0, 5) == 'array') {
-		if (oData.value !== null)
-		{
+		if (oData.value !== null) {
 			for (var i = 0; i < oData.value.length; i++) {
 				var newnode = new YAHOO.widget.eZDebugNode(oData.value[i], node, expanded, null);
 			}
 		}
 	}
 	else if (oData.type.slice(0, 4) == 'hash' || oData.type.slice(0, 6) == 'object' ) {
-		/// @todo implement data hiding (???)
-		for (var attr in oData.value) {
-			var newnode = new YAHOO.widget.eZDebugNode(oData.value[attr], node, expanded, attr);
+		if ( node.tree.sort_attributes ) {
+			var sortedattrs = [];
+			for (var attr in oData.value) {
+				sortedattrs.push(attr);
+			}
+			sortedattrs.sort();
+			for (var i = 0; i < sortedattrs.length; i++) {
+				var newnode = new YAHOO.widget.eZDebugNode(oData.value[sortedattrs[i]], node, expanded, sortedattrs[i]);
+			}
+		}
+		else {
+			for (var attr in oData.value) {
+				var newnode = new YAHOO.widget.eZDebugNode(oData.value[attr], node, expanded, attr);
+			}
 		}
 	}
 }
