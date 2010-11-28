@@ -1,10 +1,9 @@
 objInspect operator:
-. add ini file w. location of ezpo docs (online or local repos)
-. add ini file w. version of yui to use, test using 2.8.1
-. support using jsonrpc instead of jquery if ezjscore is not installed but ggwebservices is
-. show a friendly error msg if none of the two is loaded (can be tested in tpl code)
-. show a loading icon while ajax calls are executing (use yui dynamic tree)
-. remove unused images and corresponding styles in css
+. test using YUI 2.8.1
+. show a friendly error msg if user has no access rights to ws calls (can be tested before ws call is actually made)
+. move to usage of a yui dynamic tree instead of all hardcoded style/event changes for nodes
+. remove unused images for a smaller distribution zip
 . make js loading more friendly to yui:
   if ezjscore is found, leave it up to yui to load the js,
   otherwise do it by ourselves (need the 2-in-3 yui hacks)
+. use doc from ezpersisentobject_inspector extension if it is installed

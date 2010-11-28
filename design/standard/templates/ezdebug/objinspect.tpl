@@ -1,9 +1,11 @@
 {**
- Template used to render a tree (using YUI) corresponding to a template variable.
+ Template used to render a tree (using YUI) corresponding to a template variable
+ (used by the objInspect template operator).
  Original code taken from phpxmlrpc visual debugger
 
  @param $counter a counter that should be incremented for every time this tpl is used
  @param $value the variable to be debugged
+ @param $transport the ws library to be used. ggwebservices or ezjscore supported
 
  @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yui 2.8.1 (version in use in eZP 4.4)?
  @todo use smarter loading (ezjscore_based) for js & css files? nb: this tpl should work in any condition if possible
@@ -15,18 +17,29 @@
 
 {run-once}
 {* in dev mode, use full version; by default, minified version *}
-{def $preferred_version = '-min'}
+{def $preferred_packing = '-min'}
 {if eq('enabled', ezini('TemplateSettings', 'DevelopmentMode'))}
-    {set $preferred_version = ''}
+    {set $preferred_packing = ''}
+{/if}
+{def $preferred_version = ezini('InspectSettings', 'PreferredVersion', 'ezdebug.ini').yui2}
+{* allow user to specify to go with ezjscore's version, whatever that might be *}
+{if eq($preferred_version, 'ezjscore')}
+    {set $preferred_version =  ezini('eZJSCore', 'LocalScriptBasePath', 'ezjscore.ini').yui2}
+{else}
+    {* try to survive misconfigurations at least a bit *}
+    {if eq($preferred_version, '')}
+        {set $preferred_version = '2.5.0'}
+    {/if}
+    {set $preferred_version = concat('lib/yui/', $preferred_version, '/build/')}
 {/if}
 {* YUI Treeview component: base libs *}
-<script type="text/javascript" src={concat('lib/yui/2.5.0/build/yahoo/yahoo',$preferred_version,'.js')|ezdesign()} ></script>
-<script type="text/javascript" src={concat('lib/yui/2.5.0/build/event/event',$preferred_version,'.js')|ezdesign()} ></script>
+<script type="text/javascript" src={concat($preferred_version, 'yahoo/yahoo', $preferred_packing, '.js')|ezdesign()} ></script>
+<script type="text/javascript" src={concat($preferred_version, 'event/event', $preferred_packing, '.js')|ezdesign()} ></script>
 {* YUI ajax components *}
-<script type="text/javascript" src={concat('lib/yui/2.5.0/build/connection/connection',$preferred_version,'.js')|ezdesign()} ></script>
-<script type="text/javascript" src={concat('lib/yui/2.5.0/build/json/json',$preferred_version,'.js')|ezdesign()} ></script>
+<script type="text/javascript" src={concat($preferred_version, 'connection/connection', $preferred_packing,'.js')|ezdesign()} ></script>
+<script type="text/javascript" src={concat($preferred_version, 'json/json', $preferred_packing, '.js')|ezdesign()} ></script>
 {* YUI Treeview component: treeview *}
-<script type="text/javascript" src={concat('lib/yui/2.5.0/build/treeview/treeview',$preferred_version,'.js')|ezdesign()} ></script>
+<script type="text/javascript" src={concat($preferred_version, 'treeview/treeview', $preferred_packing, '.js')|ezdesign()} ></script>
 <link rel="stylesheet" type="text/css" href={'stylesheets/ezdebug/tree.css'|ezdesign()} />
 {* display components *}
 <script type="text/javascript" src={'javascript/ezdebug/objinspect.js'|ezdesign()} ></script>
@@ -35,13 +48,17 @@
 <script type="text/javascript">
     var ezdebug_trees = [];
     var ezdebug_nodes = [];
-    {*var ezdebug_sdkversion = '{$sdkversion}';*}
-    /// @todo read this from an ini file to support local manuals
-    var ezdebug_objdocroot = 'http://doc.ez.no/eZ-Publish/Technical-manual/4.x/Reference/Objects/';
-    ezdebug_objdocsuffix = '';
-    var ezjscore_url = '{'ezjscore/call/?ContentType=json'|ezurl(no, full)}';
+    var ezdebug_objdocroot = '{concat(ezini('InspectSettings', 'DocRoot', 'ezdebug.ini').objects, '/')|wash(javascript)}';
+    var ezdebug_objdocsuffix = '{ezini('InspectSettings', 'PageSuffix', 'ezdebug.ini')|wash(javascript)}';
+    var ezdebug_transport = '{$transport}';
+    {if eq($transport, 'ezjscore')}
+    var transport_url = '{'ezjscore/call/?ContentType=json'|ezurl(no, full)|wash(javascript)}';
+    {elseif eq($transport, 'ggwebservices')}
+    var transport_url = '{'webservices/execute/jsonrpc'|ezurl(no, full)|wash(javascript)}';
+    {/if}
+
 </script>
-{undef $preferred_version}
+{undef $preferred_packing $preferred_version}
 {/run-once}
 
 <div id="ezdebugparam{$counter}" class="ezdebugparamparamdiv">

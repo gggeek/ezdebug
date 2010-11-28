@@ -99,6 +99,17 @@ class eZDebugOperators
                 require_once( 'kernel/common/template.php' );
                 $tpl = templateInit();
                 $tpl->setVariable( 'counter', self::$inspectcounter );
+                $exts = eZExtension::activeExtensions();
+                $wstransport = '';
+                if ( in_array( 'ezjscore', $exts ) )
+                {
+                    $wstransport = 'ezjscore';
+                }
+                else if ( in_array( 'ggwebservices', $exts ) )
+                {
+                    $wstransport = 'ggwebservices';
+                }
+                $tpl->setVariable( 'transport', $wstransport );
                 if ( class_exists( 'ezPOInspector' ) )
                 {
                     $tpl->setVariable( 'value', json_encode( ezPOInspector::objInspect( $operatorValue ) ) );
