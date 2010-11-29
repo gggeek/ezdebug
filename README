@@ -32,8 +32,9 @@ Installation
 
 3. for the objInspect operator to work, give to the user account that you use
    for debugging access to the either one of the following policies:
-   . webservices/execute (limitation: ezp.inspect)
-   . ezjscore/call (no limitation)
+   . webservices/execute (limitation: ezp.inspect) if you use ggwebservices
+   . ezwebservicesapi/execute (limitation: inspect) if you use ezjscore
+   (note: if both ezjscore and ggwebservices are enabled, ezjscore one is used)
 
   ### ATTENTION! ###
   
