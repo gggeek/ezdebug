@@ -289,66 +289,69 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 					'success': function(o) {
 						try {
 							var response = YAHOO.lang.JSON.parse(o.responseText);
-
-							if (ezdebug_transport == 'ezjscore') {
-								if (response.error_text === undefined || response.content === undefined) {
-									alert('Invalid date received from server via ajax call (invalid json structure)');
-									eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
-									return;
-								}
-								else if (response.error_text != "") {
-									alert(response.error_text);
-									eZDebugNode_endDDRequest(o.argument.triggeringNode.endDDRequest, o.argument.originalNodeID, false);
-									return;
-								}
-								else {
-									response = response.content;
-								}
-							}
-							else { // ggwebserices
-		  						if (response.result === undefined || response.error === undefined || response.id === undefined) {
-									alert('Invalid date received from server via ajax call (invalid json structure)');
-									eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
-									return;
-								}
-								else if (response.error != null) {
-									alert(response.error);
-									eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
-									return;
-								}
-								else {
-									response = response.result;
-								}
-							}
-
-							/// @todo (!important) could we rely on closures instead of using o.argument?
-							var tree = o.argument.triggeringNode.tree;
-							var origin = tree.getNodeByIndex(o.argument.originalNodeID);
-							try {
-								/// @todo (!important) check if response.type matches origin.data.type
-								///	   nb: must be true unless origin.data.type = any
-								if (origin.data.type == 'any') {
-									// previously unknown type: set it
-									origin.data.type = response.type;
-									origin.data.value = response.value;
-								}
-								if (origin.isEmpty(response.value)) {
-									eZDebugNode_endDDRequest(origin, null, true);
-								}
-								else {
-									eZDebugNode_initChildren(origin, response, false);
-									tree.draw();
-								}
-							} catch(e) {
-								alert('Error adding new nodes to YUI tree');
-								/// @todo test if in exception we can still access o.argument.triggeringNode.endDDrequest
-								eZDebugNode_endDDRequest(o.argument.triggeringNod, o.argument.originalNodeID, true);
-							}
-
 						} catch(e) {
 							alert('Invalid data received from server via ajax call (not json?) ' + o.responseText.substr(0, 1000));
-							/// @todo test if in exception we can still access o.argument.triggeringNode.endDDrequest
 							eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
+							return;
+						}
+						if (ezdebug_transport == 'ezjscore') {
+							if (response.error_text === undefined || response.content === undefined) {
+								alert('Invalid date received from server via ajax call (invalid json structure)');
+								eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
+								return;
+							}
+							else if (response.error_text != "") {
+								alert(response.error_text);
+								eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
+								return;
+							}
+							else {
+								response = response.content;
+							}
+						}
+						else { // ggwebserices
+							if (response.result === undefined || response.error === undefined || response.id === undefined) {
+								alert('Invalid data received from server via ajax call (invalid json structure)');
+								eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
+								return;
+							}
+							else if (response.error != null) {
+								alert(response.error);
+								eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
+								return;
+							}
+							else {
+								response = response.result;
+							}
+						}
+
+						if (response === false) {
+						    alert('Invalid data received from server via ajax call (empty content)');
+							eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
+							return;
+						}
+
+						/// @todo (!important) could we rely on closures instead of using o.argument?
+						var tree = o.argument.triggeringNode.tree;
+						var origin = tree.getNodeByIndex(o.argument.originalNodeID);
+						/// @todo (!important) check if response.type matches origin.data.type
+						///	   nb: must be true unless origin.data.type = any
+						if (origin.data.type == 'any') {
+							// previously unknown type: set it
+							origin.data.type = response.type;
+							origin.data.value = response.value;
+						}
+						if (origin.isEmpty(response.value)) {
+							eZDebugNode_endDDRequest(origin, null, true);
+						}
+						else {
+							try {
+								eZDebugNode_initChildren(origin, response, false);
+								tree.draw();
+							} catch(e) {
+								alert('Error adding new nodes to YUI tree');
+								eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, true);
+							}
 						}
 					},
 
