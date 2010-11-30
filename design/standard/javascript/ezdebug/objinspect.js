@@ -266,7 +266,7 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 			else {
 				// at root of tree, and no po found: the original array/hash is really
 				// meant to be empty
-				this.endDDRequest(originalNodeID, true);
+				eZDebugNode_endDDRequest(this, originalNodeID, true);
 			}
 		}
 		else {
@@ -293,12 +293,12 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 							if (ezdebug_transport == 'ezjscore') {
 								if (response.error_text === undefined || response.content === undefined) {
 									alert('Invalid date received from server via ajax call (invalid json structure)');
-									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
 									return;
 								}
 								else if (response.error_text != "") {
 									alert(response.error_text);
-									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									eZDebugNode_endDDRequest(o.argument.triggeringNode.endDDRequest, o.argument.originalNodeID, false);
 									return;
 								}
 								else {
@@ -308,12 +308,12 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 							else { // ggwebserices
 		  						if (response.result === undefined || response.error === undefined || response.id === undefined) {
 									alert('Invalid date received from server via ajax call (invalid json structure)');
-									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
 									return;
 								}
 								else if (response.error != null) {
 									alert(response.error);
-									o.argument.triggeringNode.endDDRequest(o.argument.originalNodeID, false);
+									eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
 									return;
 								}
 								else {
@@ -333,7 +333,7 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 									origin.data.value = response.value;
 								}
 								if (origin.isEmpty(response.value)) {
-									origin.endDDRequest(null, true);
+									eZDebugNode_endDDRequest(origin, null, true);
 								}
 								else {
 									eZDebugNode_initChildren(origin, response, false);
@@ -342,19 +342,19 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 							} catch(e) {
 								alert('Error adding new nodes to YUI tree');
 								/// @todo test if in exception we can still access o.argument.triggeringNode.endDDrequest
-								o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, true);
+								eZDebugNode_endDDRequest(o.argument.triggeringNod, o.argument.originalNodeID, true);
 							}
 
 						} catch(e) {
 							alert('Invalid data received from server via ajax call (not json?) ' + o.responseText.substr(0, 1000));
 							/// @todo test if in exception we can still access o.argument.triggeringNode.endDDrequest
-							o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, false);
+							eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
 						}
 					},
 
 					'failure': function(o) {
 						alert(o.statusText);
-						o.argument.triggeringNode.endDDrequest(o.argument.originalNodeID, false);
+						eZDebugNode_endDDRequest(o.argument.triggeringNode, o.argument.originalNodeID, false);
 					},
 
 					'argument': {'originalNodeID': originalNodeID, 'triggeringNode': this}
@@ -372,31 +372,6 @@ YAHOO.extend(YAHOO.widget.eZDebugNode, YAHOO.widget.Node, {
 		originToggle.onmouseout = null;
 		originToggle.onclick = null;
 		originToggle.className = 'ygtvloading';
-	},
-
-	/// restore event handlers, icon to 'loading' to specified node. If node unspecified, use current one
-	endDDRequest: function(originalNodeID, opened) {
-		if ( originalNodeID != null ) {
-			var originToggle = this.tree.getNodeByIndex(originalNodeID).getToggleEl();
-		}
-		else {
-			var originToggle = this.getToggleEl();
-			originalNodeID = this.index;
-		}
-		if (opened) {
-			originToggle.onmouseover = null;
-			originToggle.onmouseout = null;
-			originToggle.onclick = null;
-			originToggle.className = 'ygtvlm';
-		}
-		else {
-			originToggle.onmouseover = 'this.className="ygtvlph"';
-			originToggle.onmouseout = 'this.className="ygtvlp"';
-			var treeId = this.tree.id;
-			originToggle.onclick = function(){YAHOO.widget.TreeView.getNode(treeId, originalNodeID).drillDown([])}
-			originToggle.className = 'ygtvlp';
-		}
-
 	},
 
 	isScalar: function(value) {
@@ -446,6 +421,32 @@ function eZDebugNode_initChildren (node, oData, expanded) {
 		}
 	}
 }
+
+// moved here because of mysterious problem in adding it to eZDebugNode via Yahoo extend
+// and having it available still inside the catch() block of exceptions
+function eZDebugNode_endDDRequest(triggeringNode, originalNodeID, opened) {
+		if ( originalNodeID != null ) {
+			var originToggle = triggeringNode.tree.getNodeByIndex(originalNodeID).getToggleEl();
+		}
+		else {
+			var originToggle = triggeringNode.getToggleEl();
+			originalNodeID = triggeringNode.index;
+		}
+		if (opened) {
+			originToggle.onmouseover = null;
+			originToggle.onmouseout = null;
+			originToggle.onclick = null;
+			originToggle.className = 'ygtvlm';
+		}
+		else {
+			originToggle.onmouseover = 'this.className="ygtvlph"';
+			originToggle.onmouseout = 'this.className="ygtvlp"';
+			var treeId = triggeringNode.tree.id;
+			originToggle.onclick = function(){YAHOO.widget.TreeView.getNode(treeId, originalNodeID).drillDown([])}
+			originToggle.className = 'ygtvlp';
+		}
+
+	}
 
 /* for those poor browsers that have a lacking JS implementation, we provide JS 1.5 compat.... */
 if(typeof Array.prototype.indexOf==='undefined')Array.prototype.indexOf=function(n){for(var i=0;i<this.length;i++){if(this[i]===n){return i;}}return -1;}
