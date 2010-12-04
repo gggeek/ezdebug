@@ -1,6 +1,6 @@
 objInspect operator:
 . move to usage of a yui dynamic tree instead of all hardcoded style/event changes for nodes
-. fix interactive output printed to the debug output instead of on-screen - does not show in opera and chrome (nor ie8)
+. fix interactive output printed to the debug output instead of on-screen with IE
 . add a minified version of objinspect.js
 . show a friendly error msg if user has no access rights to ws calls (can be tested before ws call is actually made)
 . remove unused images for a smaller distribution zip

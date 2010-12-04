@@ -7,6 +7,7 @@
  @param $value the variable to be debugged
  @param $transport the ws library to be used. ggwebservices or ezjscore supported
  @param $sort_attributes
+ @param $send_to_debug
 
  @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yui 2.8.1 (version in use in eZP 4.4)?
  @todo use smarter loading (ezjscore_based) for js & css files? nb: this tpl should work in any condition if possible
@@ -61,15 +62,28 @@
 </script>
 {undef $preferred_packing $preferred_version}
 {/run-once}
-
-<div id="ezdebugparam{$counter}" class="ezdebugparamparamdiv">
-    <noscript>
-    WARNING: this box is completely useless without javascript support.<br />Please use a javascript-enabled browser.
-    </noscript>
-</div>
+{if $send_to_debug|not()}
+    {include uri='design:ezdebug/objinspectdebugoutput.tpl'}
+{else}
+    {run-once}
+    <script type="text/javascript" src={'javascript/ezdebug/fixdebugoutput.js'|ezdesign()} ></script>
+    {/run-once}
+{/if}
 <script type="text/javascript">
-    ezdebug_trees[{$counter}] = new YAHOO.widget.TreeView('ezdebugparam{$counter}');
-    ezdebug_trees[{$counter}].sort_attributes = {if $sort_attributes}true{else}false{/if};
-    ezdebug_nodes[{$counter}] = new YAHOO.widget.eZDebugNode({$value}, ezdebug_trees[{$counter}].getRoot(), true, null);
-    ezdebug_trees[{$counter}].draw();
+    function ezdebug_display_{$counter}() {ldelim}
+
+        ezdebug_trees[{$counter}] = new YAHOO.widget.TreeView('ezdebugparam{$counter}');
+        ezdebug_trees[{$counter}].sort_attributes = {if $sort_attributes}true{else}false{/if};
+        ezdebug_nodes[{$counter}] = new YAHOO.widget.eZDebugNode({$value}, ezdebug_trees[{$counter}].getRoot(), true, null);
+        ezdebug_trees[{$counter}].draw();
+    {rdelim}
+
+    {if $send_to_debug|not()}
+    ezdebug_display_{$counter}();
+    {else}
+    if (window.addEventListener)
+        window.addEventListener('load', function(){ldelim} fixDebugOutput('ezdebugparam{$counter}'); ezdebug_display_{$counter}(); {rdelim}, false);
+    else if (window.attachEvent)
+        window.attachEvent('onload',  function(){ldelim} fixDebugOutput('ezdebugparam{$counter}'); {rdelim});
+    {/if}
 </script>

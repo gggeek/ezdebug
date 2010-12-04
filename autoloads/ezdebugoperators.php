@@ -131,20 +131,14 @@ class eZDebugOperators
                     $tpl->setVariable( 'error', "Cannot insepct value: extension ezpersistentobject_inspector most likely missing" );
                 }
                 $tpl->setVariable( 'sort_attributes', $namedParameters['sort_attributes'] );
-                $out = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
+                $tpl->setVariable( 'send_to_debug', $namedParameters['send_to_debug'] );
+                $operatorValue = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
                 if ( $namedParameters['send_to_debug'] )
                 {
-                    // send full html block to debug output via a debug msg
-                    eZDebug::writeDebug( $out, 'objInspect ' . self::$inspectcounter );
-                    // show within page some js code that will later cleanup the
-                    // msg in the debug output
+                    // send div to debug output via a debug msg
                     $tpl = templateInit();
                     $tpl->setVariable( 'counter', self::$inspectcounter );
-                    $operatorValue = $tpl->fetch( 'design:ezdebug/objinspectdebugoutput.tpl' );;
-                }
-                else
-                {
-                    $operatorValue = $out;
+                    eZDebug::writeDebug( $tpl->fetch( 'design:ezdebug/objinspectdebugoutput.tpl' ), 'objInspect ' . self::$inspectcounter );
                 }
                 self::$inspectcounter++;
                 break;
