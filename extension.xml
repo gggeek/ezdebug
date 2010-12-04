@@ -2,6 +2,7 @@
 <software>
     <dependencies>
         <uses>
+            <extension name="ezwebservicesapi" />
             <extension name="ezjscore" />
             <extension name="ggwebservices" />
             <extension name="ezpersistentobject_inspector" />
