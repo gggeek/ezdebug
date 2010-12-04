@@ -39,6 +39,11 @@ class eZDebugOperators
                 'type' => 'boolean',
                 'required' => false,
                 'default' => false
+            ),
+            'send_to_debug' => array(
+                'type' => 'boolean',
+                'required' => false,
+                'default' => false
             )
         ),
         'addTimingPoint' => array(
@@ -126,7 +131,19 @@ class eZDebugOperators
                     $tpl->setVariable( 'error', "Cannot insepct value: extension ezpersistentobject_inspector most likely missing" );
                 }
                 $tpl->setVariable( 'sort_attributes', $namedParameters['sort_attributes'] );
-                $operatorValue = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
+                $out = $tpl->fetch( 'design:ezdebug/objinspect.tpl' );
+                if ( $namedParameters['send_to_debug'] )
+                {
+                    // send full html block to debug output via a debug msg
+                    eZDebug::writeDebug( $out, 'objInspect' );
+                    $tpl = templateInit();
+                    $tpl->setVariable( 'counter', self::$inspectcounter );
+                    $operatorValue = $tpl->fetch( 'design:ezdebug/objinspectdebugoutput.tpl' );;
+                }
+                else
+                {
+                    $operatorValue = $out;
+                }
                 self::$inspectcounter++;
                 break;
             case 'addTimingPoint':

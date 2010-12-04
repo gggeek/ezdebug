@@ -77,8 +77,9 @@ found (either in the main database or in the cluster database).
 It is also helpful to debug performance problems.
 
 The fifth one is meant to enable user-friendly, graphically-pleasing way to dump
-variables in the middle of a template: objects can be inspected via drill-down
-of their properties, links are available to the ez.no online docs, and much more.
+variables either in the middle of a template or in the debug output: objects can
+be inspected via drill-down of their properties, links are available to the ez.no
+online docs, and much more.
 You really have to see it to believe it!
 
 
@@ -100,7 +101,7 @@ prints in the debug logs instead of the middle of the web page.
 
 4) ''|numQueries( [cluster_db=false] )
 
-5) $value|objInspect( [sort_attributes=false] )
+5) $value|objInspect( [sort_attributes=false], [show_in_debug=false] )
 
 
 Example usage:

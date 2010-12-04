@@ -10,6 +10,7 @@
 
  @todo switch to yui 3? nb: treeview widget is not officially in yet... maybe upgrade to yui 2.8.1 (version in use in eZP 4.4)?
  @todo use smarter loading (ezjscore_based) for js & css files? nb: this tpl should work in any condition if possible
+       example yui 2in3: YUI().use("yui2-button", function(Y) { var YAHOO = Y.YUI2; var button = new YAHOO.widget.Button("mybutton"); });
 
  @version $Id$
  @copyright (C) Gaetano Giunta 2010
