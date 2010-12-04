@@ -5,7 +5,7 @@ class ezdebugInfo
     {
         return array(
             'Name' => "<a href=\"http://projects.ez.no/ezdebug_template_operator\">eZ Debug extension</a>",
-            'Version' => "0.4-beta",
+            'Version' => "0.4",
             'Copyright' => "Copyright (C) 2008-2010 Gaetano Giunta",
             'License' => "GNU General Public License v2.0",
             'Includes the following third-party software' => array(
