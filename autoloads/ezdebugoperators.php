@@ -3,7 +3,7 @@
 *
 * @author Gaetano Giunta
 * @version $Id$
-* @copyright (C) Gaetano Giunta 2008-2010
+* @copyright (C) Gaetano Giunta 2008-2011
 * @license code licensed under the GPL License: see README
 * @access public
 */
@@ -58,8 +58,14 @@ class eZDebugOperators
                 'required' => false,
                 'default' => false
             )
+        ),
+        'getDefinedVars'  => array(
+            'namespace' => array(
+                'type' => 'string',
+                'required' => false,
+                'default' => ''
+            )
         )
-
     );
 
     static $inspectcounter = 1;
@@ -148,6 +154,8 @@ class eZDebugOperators
                 break;
             case 'numQueries':
                 $operatorValue = $this->numqueries( $namedParameters['cluster'] );
+            case 'getDefinedVars':
+                $operatorValue = $this->getDefinedVars( $tpl, $namedParameters['namespace'], $rootNamespace, $currentNamespace );
         }
     }
 
@@ -215,6 +223,39 @@ class eZDebugOperators
         return $num;
     }
 
+    // idea taken from the show_variables extension from ckosny@gmx.net
+    function getDefinedVars( $tpl, $filternamespace='', $rootNamespace=null, $currentNamespace=null )
+    {
+        //return array_merge( $tpl->Variables, array( 'current' => $currentNamespace, 'root' => $rootNamespace ) );
+        $vars = array();
+        foreach( $tpl->Variables as $namespace => $nvars )
+        {
+            // show variables in other namespaces using appropriate syntax,
+            // except if 'other namespace' is the current one
+            if ( $namespace != '' && $namespace != $currentNamespace )
+            {
+                $fixed = array();
+                foreach( $nvars as $key => $val )
+                {
+                    $fixed["$namespace:$key"] = $val;
+                }
+                $nvars = $fixed;
+            }
+
+            if ( $namespace == '' )
+            {
+                /// @todo fix this to allow namespace filtering: is this called 'root', 'global' or what?
+                //$namespace = '';
+            }
+
+            if ( $filternamespace == '' || $filternamespace == $namespace )
+            {
+                $vars = array_merge( $vars, $nvars );
+            }
+        }
+        ksort( $vars );
+        return $vars;
+    }
 }
 
 ?>
