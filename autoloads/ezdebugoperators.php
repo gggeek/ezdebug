@@ -134,7 +134,7 @@ class eZDebugOperators
                 else
                 {
                     $tpl->setVariable( 'value', null );
-                    $tpl->setVariable( 'error', "Cannot insepct value: extension ezpersistentobject_inspector most likely missing" );
+                    $tpl->setVariable( 'error', "Cannot inspect value: extension ezpersistentobject_inspector most likely missing" );
                 }
                 $tpl->setVariable( 'sort_attributes', $namedParameters['sort_attributes'] );
                 $tpl->setVariable( 'send_to_debug', $namedParameters['send_to_debug'] );
