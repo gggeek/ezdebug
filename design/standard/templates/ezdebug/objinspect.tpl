@@ -24,7 +24,7 @@
 {if eq('enabled', ezini('TemplateSettings', 'DevelopmentMode'))}
     {set $preferred_packing = ''}
 {/if}
-{def $preferred_version = ezini('DebugSettings', 'PreferredVersion', 'ezdebug.ini').yui2}
+{def $preferred_version = ezini('InspectSettings', 'PreferredVersion', 'ezdebug.ini').yui2}
 {* allow user to specify to go with ezjscore's version, whatever that might be *}
 {if eq($preferred_version, 'ezjscore')}
     {set $preferred_version =  ezini('eZJSCore', 'LocalScriptBasePath', 'ezjscore.ini').yui2}
