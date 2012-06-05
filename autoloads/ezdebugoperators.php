@@ -154,8 +154,10 @@ class eZDebugOperators
                 break;
             case 'numQueries':
                 $operatorValue = $this->numqueries( $namedParameters['cluster'] );
+                break;
             case 'getDefinedVars':
                 $operatorValue = $this->getDefinedVars( $tpl, $namedParameters['namespace'], $rootNamespace, $currentNamespace );
+                break;
         }
     }
 
