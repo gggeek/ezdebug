@@ -3,8 +3,7 @@
  * nested structures of eZP template values
  *
  * @author G. Giunta
- * @version $Id$
- * @copyright (C) Gaetano Giunta 2010-2011
+ * @copyright (C) Gaetano Giunta 2010-2013
  * @license code licensed under the GPL License: see README
  *
  * @todo the tree preloads the standard tree images (via stylesheet). we should do the same for our custom images

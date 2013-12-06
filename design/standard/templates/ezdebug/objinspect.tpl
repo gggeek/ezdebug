@@ -13,8 +13,7 @@
  @todo use smarter loading (ezjscore_based) for js & css files? nb: this tpl should work in any condition if possible
        example yui 2in3: YUI().use("yui2-button", function(Y) { var YAHOO = Y.YUI2; var button = new YAHOO.widget.Button("mybutton"); });
 
- @version $Id$
- @copyright (C) Gaetano Giunta 2010-2011
+ @copyright (C) Gaetano Giunta 2010-2013
  @license code licensed under the GPL License: see README
 *}
 

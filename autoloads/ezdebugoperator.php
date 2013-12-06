@@ -1,6 +1,6 @@
 <?php
 /**
-* This class is left in only for bacward compatibility, it will be removed soon!
+* This class is left in only for backward compatibility, it will be removed soon!
 */
 
 /// @deprecated

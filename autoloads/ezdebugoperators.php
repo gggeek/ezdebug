@@ -2,8 +2,7 @@
 /**
 *
 * @author Gaetano Giunta
-* @version $Id$
-* @copyright (C) Gaetano Giunta 2008-2011
+* @copyright (C) Gaetano Giunta 2008-2013
 * @license code licensed under the GPL License: see README
 * @access public
 */

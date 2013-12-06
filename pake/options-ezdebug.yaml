@@ -12,10 +12,10 @@ ezp:
         minor: 0
         release: 7
 
-#git:
-#    url: https://github.com/gggeek/ggwebservices.git
-svn:
-    url: http://svn.projects.ez.no/ezdebug_template_operator/trunk/extension/ezdebug
+git:
+    url: https://github.com/gggeek/ezdebug.git
+#svn:
+#    url: http://svn.projects.ez.no/ezdebug_template_operator/trunk/extension/ezdebug
 
 create:
     tarball: no

@@ -1,4 +1,6 @@
 <?php /*
+
 [TemplateSettings]
 ExtensionAutoloadPath[]=ezdebug
-*/ ?>
+
+ */ ?>
