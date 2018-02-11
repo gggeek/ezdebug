@@ -2,7 +2,7 @@
     "name": "gggeek/ezdebug",
     "type": "ezpublish-legacy-extension",
     "description": "Putting the fun back into eZ Publish (4.x/LS) debugging: new template operators for the developer",
-    "license": "GNU General Public License v2.0",
+    "license": "GPL-2.0-or-later",
     "homepage": "http://projects.ez.no/ezdebug_template_operator",
     "minimum-stability": "dev",
     "require": {
